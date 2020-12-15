@@ -7,17 +7,22 @@
 using namespace std;
 
 extern int yyparse();
-extern NBlock* programBlock;
+extern NBlock *programBlock;
 
 int main(int argc, char **argv)
-{   
+{
     freopen("in.txt", "r", stdin);
+    freopen("out.py", "w", stdout);
     yyparse();
-    std::cout << programBlock << std::endl;
+    std::cerr << programBlock << std::endl;
 
     CodeGenContext context;
     context.generateCode(*programBlock);
-    // context.runCode();
-    
+
+    std::string code = context.outputCode();
+    std::cout << code << std::endl;
+
+    fclose(stdin);
+    fclose(stdout);
     return 0;
 }

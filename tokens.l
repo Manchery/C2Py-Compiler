@@ -7,6 +7,11 @@
 extern "C" int yywrap() { }
 %}
 
+/* "int"                                   SAVE_TOKEN; return TINTTYPE;  */
+/* "double"                                SAVE_TOKEN; return TDOUBLETYPE; */
+/* "char"                                  SAVE_TOKEN; return TCHARTYPE; */
+/* "void"                                  SAVE_TOKEN; return TVOID;} */
+
 %%
 
 [ \t\n]                                 ;
@@ -16,11 +21,6 @@ extern "C" int yywrap() { }
 "else"                                  return TOKEN(TELSE);
 "for"                                   return TOKEN(TFOR);
 "while"                                 return TOKEN(TWHILE);
-
-"int"                                   return TOKEN(TINTTYPE);
-"double"                                return TOKEN(TDOUBLETYPE);
-"char"                                  return TOKEN(TCHARTYPE);
-"void"                                  return TOKEN(TVOID);
 
 [a-zA-Z_][a-zA-Z0-9_]*                  SAVE_TOKEN; return TIDENTIFIER;
 [0-9]+\.[0-9]*                          SAVE_TOKEN; return TDOUBLE;

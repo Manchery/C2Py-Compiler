@@ -3,7 +3,7 @@
     NBlock *programBlock; /* the top level root node of our final AST */
 
     extern int yylex();
-    void yyerror(const char *s) { printf("ERROR: %sn", s); }
+    void yyerror(const char *s) { fprintf(stderr, "ERROR: %sn", s); }
 %}
 
 %error-verbose
@@ -26,10 +26,16 @@
    match our tokens.l lex file. We also define the node type
    they represent.
  */
-%token <string> TIDENTIFIER TINTEGER TDOUBLE
+%token <string> TIDENTIFIER TINTEGER TDOUBLE TCHAR TSTRING
+// %token <string> TINTTYPE TDOUBLETYPE TCHARTYPE TVOID
+
+%token <token> TIF TELSE TFOR TWHILE
+
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
+%token <token> TOR TAND
 %token <token> TPLUS TMINUS TMUL TDIV
-%token <token> TLPAREN TRPAREN TLBRACE TRBRACE
+
+%token <token> TLPAREN TRPAREN TLBRACE TRBRACE TLBRACK TRBRACK
 %token <token> TCOMMA TDOT TSEMICOLON
 
 /* Define the type of node our nonterminal symbols represent.
@@ -56,21 +62,21 @@
 program : stmts { programBlock = $1; }
         ;
         
-stmts : stmt { printf("stmts->stmt\n"); $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
-      | stmts stmt { printf("stmts->stmts stmt\n"); $1->statements.push_back($<stmt>2); }
+stmts : stmt { fprintf(stderr, "stmts->stmt\n"); $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
+      | stmts stmt { fprintf(stderr, "stmts->stmts stmt\n"); $1->statements.push_back($<stmt>2); }
       ;
 
-stmt : func_decl { printf("stmt->func_decl\n"); }
-     | var_decl TSEMICOLON { printf("stmt->var_decl TSEMICOLON\n"); }
-     | expr TSEMICOLON { printf("stmt->expr TSEMICOLON\n"); $$ = new NExpressionStatement(*$1); }
+stmt : func_decl { fprintf(stderr, "stmt->func_decl\n"); }
+     | var_decl TSEMICOLON { fprintf(stderr, "stmt->var_decl TSEMICOLON\n"); }
+     | expr TSEMICOLON { fprintf(stderr, "stmt->expr TSEMICOLON\n"); $$ = new NExpressionStatement(*$1); }
      ;
 
-block : TLBRACE stmts TRBRACE { printf("block->TLBRACE stmts TRBRACE"); $$ = $2; }
+block : TLBRACE stmts TRBRACE { fprintf(stderr, "block->TLBRACE stmts TRBRACE"); $$ = $2; }
       | TLBRACE TRBRACE { $$ = new NBlock(); }
       ;
 
-var_decl : ident ident { printf("var_decl->ident ident\n"); $$ = new NVariableDeclaration(*$1, *$2); }
-         | ident ident TEQUAL expr { printf("var_decl->ident ident TEQUAL expr\n"); $$ = new NVariableDeclaration(*$1, *$2, $4); }
+var_decl : ident ident { fprintf(stderr, "var_decl->ident ident\n"); $$ = new NVariableDeclaration(*$1, *$2); }
+         | ident ident TEQUAL expr { fprintf(stderr, "var_decl->ident ident TEQUAL expr\n"); $$ = new NVariableDeclaration(*$1, *$2, $4); }
          ;
         
 func_decl : ident ident TLPAREN func_decl_args TRPAREN block 
@@ -78,23 +84,23 @@ func_decl : ident ident TLPAREN func_decl_args TRPAREN block
           ;
     
 func_decl_args : /*blank*/  { $$ = new VariableList(); }
-          | var_decl { printf("func_decl_args->var_decl\n"); $$ = new VariableList(); $$->push_back($<var_decl>1); }
+          | var_decl { fprintf(stderr, "func_decl_args->var_decl\n"); $$ = new VariableList(); $$->push_back($<var_decl>1); }
           | func_decl_args TCOMMA var_decl { $1->push_back($<var_decl>3); }
           ;
 
-ident : TIDENTIFIER { std::cout<<"ident->"<<*$1<<std::endl; $$ = new NIdentifier(*$1); delete $1; }
+ident : TIDENTIFIER { std::cerr<<"ident->"<<*$1<<std::endl; $$ = new NIdentifier(*$1); delete $1; }
       ;
 
-numeric : TINTEGER { printf("numeric->TINTEGER %s\n", $1->c_str()); $$ = new NInteger(atol($1->c_str())); delete $1; }
-        | TDOUBLE { printf("numeric->TDOUBLE %s\n", $1->c_str()); $$ = new NDouble(atof($1->c_str())); delete $1; }
+numeric : TINTEGER { fprintf(stderr, "numeric->TINTEGER %s\n", $1->c_str()); $$ = new NInteger(atol($1->c_str())); delete $1; }
+        | TDOUBLE { fprintf(stderr, "numeric->TDOUBLE %s\n", $1->c_str()); $$ = new NDouble(atof($1->c_str())); delete $1; }
         ;
     
-expr : ident TEQUAL expr { printf("expr->ident TEQUAL expr\n"); $$ = new NAssignment(*$<ident>1, *$3); }
-     | ident TLPAREN call_args TRPAREN { printf("expr->ident TLPAREN call_args TRPAREN\n"); $$ = new NMethodCall(*$1, *$3); delete $3; }
-     | ident { printf("expr->ident\n"); $<ident>$ = $1; }
-     | numeric { printf("expr->numeric\n"); }
-     | expr comparison expr { printf("expr->expr comparison expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
-     | TLPAREN expr TRPAREN { printf("expr->TLPAREN expr TRPAREN\n"); $$ = $2; }
+expr : ident TEQUAL expr { fprintf(stderr, "expr->ident TEQUAL expr\n"); $$ = new NAssignment(*$<ident>1, *$3); }
+     | ident TLPAREN call_args TRPAREN { fprintf(stderr, "expr->ident TLPAREN call_args TRPAREN\n"); $$ = new NMethodCall(*$1, *$3); delete $3; }
+     | ident { fprintf(stderr, "expr->ident\n"); $<ident>$ = $1; }
+     | numeric { fprintf(stderr, "expr->numeric\n"); }
+     | expr comparison expr { fprintf(stderr, "expr->expr comparison expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
+     | TLPAREN expr TRPAREN { fprintf(stderr, "expr->TLPAREN expr TRPAREN\n"); $$ = $2; }
      ;
     
 call_args : /*blank*/  { $$ = new ExpressionList(); }

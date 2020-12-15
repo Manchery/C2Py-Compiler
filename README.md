@@ -3,5 +3,5 @@
 ```
 make clean
 make
-./parser <in.txt
+./parser
 ```
