@@ -4,13 +4,28 @@
 
 using namespace std;
 
+std::ostream &operator<<(std::ostream &os, ExprType type)
+{
+    if (type == INT)
+        os << "INT";
+    if (type == DOUBLE)
+        os << "DOUBLE";
+    if (type == CHAR)
+        os << "CHAR";
+    if (type == STR)
+        os << "STR";
+    if (type == VOID)
+        os << "VOID";
+    return os;
+}
+
 /* Compile the AST into a module */
 void CodeGenContext::generateCode(NBlock &root)
 {
     std::cerr << "Generating code...n" << std::endl;
     root.codeGen(*this); /* emit bytecode for the toplevel block */
 
-    // code << "main()" << std::endl;
+    code << "if __name__ == '__main__':\n\tmain()" << std::endl;
 }
 
 std::string CodeGenContext::outputCode()
@@ -110,7 +125,7 @@ void NExpressionStatement::codeGen(CodeGenContext &context)
 
 void NVariableDeclaration::codeGen(CodeGenContext &context)
 {
-    std::cerr << "Creating variable declaration " << type.name << " " << id.name << std::endl;
+    std::cerr << "Creating variable declaration " << type.type << " " << id.name << std::endl;
     if (assignmentExpr != NULL)
     {
         NAssignment assn(id, *assignmentExpr);

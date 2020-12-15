@@ -7,20 +7,20 @@
 extern "C" int yywrap() { }
 %}
 
-/* "int"                                   SAVE_TOKEN; return TINTTYPE;  */
-/* "double"                                SAVE_TOKEN; return TDOUBLETYPE; */
-/* "char"                                  SAVE_TOKEN; return TCHARTYPE; */
-/* "void"                                  SAVE_TOKEN; return TVOID;} */
-
 %%
 
+^"#include ".+                          fprintf(stderr, "include line\n");
 [ \t\n]                                 ;
-#include\\s*([<\"])([^>\"]+)([>\"])     printf("include line\n");
 
 "if"                                    return TOKEN(TIF);
 "else"                                  return TOKEN(TELSE);
 "for"                                   return TOKEN(TFOR);
 "while"                                 return TOKEN(TWHILE);
+
+"int"                                   SAVE_TOKEN; return TINTTYPE; 
+"double"                                SAVE_TOKEN; return TDOUBLETYPE;
+"char"                                  SAVE_TOKEN; return TCHARTYPE;
+"void"                                  SAVE_TOKEN; return TVOIDTYPE;
 
 [a-zA-Z_][a-zA-Z0-9_]*                  SAVE_TOKEN; return TIDENTIFIER;
 [0-9]+\.[0-9]*                          SAVE_TOKEN; return TDOUBLE;

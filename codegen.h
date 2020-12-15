@@ -1,5 +1,8 @@
+#include "node.h"
 #include <stack>
 #include <sstream>
+
+std::ostream &operator<<(std::ostream &os, ExprType type);
 
 class NBlock;
 
