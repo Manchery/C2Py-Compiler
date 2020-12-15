@@ -143,8 +143,9 @@ void NBlock::codeGen(CodeGenContext &context)
         context.code << std::string(context.indent, '\t') << "pass" << std::endl;
     }
 
-    std::cerr << "Current indents: " << context.indent << std::endl;
+    std::cerr << "Leaving block" << std::endl;
     context.indent--;
+    std::cerr << "Current indents: " << context.indent << std::endl;
 }
 
 void NExpressionStatement::codeGen(CodeGenContext &context)
@@ -157,7 +158,7 @@ void NExpressionStatement::codeGen(CodeGenContext &context)
 void NVariableDeclaration::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating variable declaration " << type << " " << id.name << std::endl;
-    if (assignmentExpr != NULL)
+    if (assignmentExpr != nullptr)
     {
         NAssignment assn(id, *assignmentExpr);
         assn.codeGen(context);
@@ -203,4 +204,38 @@ void NIfStatement::codeGen(CodeGenContext &context)
         context.code << std::string(context.indent, '\t') << "else:" << std::endl;
         falseBlock->codeGen(context);
     }
+}
+
+void NForStatement::codeGen(CodeGenContext &context)
+{
+    std::cerr << "Creating for statement" << std::endl;
+
+    if (initializerExpr != nullptr)
+        initializerExpr->codeGen(context);
+    if (initializerDecl != nullptr)
+        initializerDecl->codeGen(context);
+
+    context.code << std::string(context.indent, '\t');
+    context.code << "while ";
+    condition->codeGen(context);
+    context.code << ":" << std::endl;
+
+    block->codeGen(context);
+
+    context.indent++;
+    context.code << std::string(context.indent, '\t');
+    iterator->codeGen(context);
+    context.code << std::endl;
+    context.indent--;
+}
+
+void NWhileStatement::codeGen(CodeGenContext &context)
+{
+    std::cerr << "Creating while statement" << std::endl;
+
+    context.code << "while ";
+    condition->codeGen(context);
+    context.code << ":" << std::endl;
+
+    block->codeGen(context);
 }

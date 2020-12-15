@@ -123,7 +123,7 @@ public:
     ExprType type;
     NIdentifier &id;
     NExpression *assignmentExpr;
-    NVariableDeclaration(ExprType type, NIdentifier &id) : type(type), id(id) {}
+    NVariableDeclaration(ExprType type, NIdentifier &id) : type(type), id(id), assignmentExpr(nullptr) {}
     NVariableDeclaration(ExprType type, NIdentifier &id, NExpression *assignmentExpr) : type(type), id(id), assignmentExpr(assignmentExpr) {}
     virtual void codeGen(CodeGenContext &context);
 };
@@ -149,6 +149,35 @@ public:
     NIfStatement(NExpression &condition,
                  NBlock *trueBlock,
                  NBlock *falseBlock = nullptr) : condition(condition), trueBlock(trueBlock), falseBlock(falseBlock) {}
+    virtual void codeGen(CodeGenContext &context);
+};
+
+class NForStatement : public NStatement
+{
+public:
+    NExpression *initializerExpr;
+    NStatement *initializerDecl;
+    NExpression *condition;
+    NExpression *iterator;
+    NBlock *block;
+    NForStatement(NExpression *initializerExpr,
+                  NExpression *condition,
+                  NExpression *iterator,
+                  NBlock *block) : initializerExpr(initializerExpr), initializerDecl(nullptr), condition(condition), iterator(iterator), block(block) {}
+    NForStatement(NStatement *initializerDecl,
+                  NExpression *condition,
+                  NExpression *iterator,
+                  NBlock *block) : initializerExpr(nullptr), initializerDecl(initializerDecl), condition(condition), iterator(iterator), block(block) {}
+    virtual void codeGen(CodeGenContext &context);
+};
+
+class NWhileStatement : public NStatement
+{
+public:
+    NExpression *condition;
+    NBlock *block;
+    NWhileStatement(NExpression *condition,
+                    NBlock *block) : condition(condition), block(block) {}
     virtual void codeGen(CodeGenContext &context);
 };
 

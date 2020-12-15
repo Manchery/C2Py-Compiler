@@ -11,6 +11,18 @@ def do_math(a):
 			pass
 	if ((x == (2 + 3)) or (a == 2)):
 		pass
+	b = None
+	c = 0
+	i = 0
+	while (i < 10):
+		c = (c + i)
+		i = (i + 1)
+	while (c > 0):
+		c = (c - 1)
+		while (a != 0):
+			a = (a + b)
+		if (a != b):
+			d = None
 
 def main():
 	a = 3
