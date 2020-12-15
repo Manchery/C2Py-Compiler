@@ -55,6 +55,7 @@ void NMethodCall::codeGen(CodeGenContext &context)
 void NBinaryOperator::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating binary operation " << op << std::endl;
+    context.code << "(";
     lhs.codeGen(context);
 
     switch (op)
@@ -74,6 +75,7 @@ void NBinaryOperator::codeGen(CodeGenContext &context)
     }
 
     rhs.codeGen(context);
+    context.code << ")";
 }
 
 void NAssignment::codeGen(CodeGenContext &context)
