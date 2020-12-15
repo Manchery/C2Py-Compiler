@@ -29,15 +29,11 @@
  */
 %token <string> TIDENTIFIER TINTEGER TDOUBLE TCHAR TSTRING
 %token <token> TINTTYPE TDOUBLETYPE TCHARTYPE TVOIDTYPE
-
 %token <token> TIF TELSE TFOR TWHILE
-
-%token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
-%token <token> TOR TAND
-%token <token> TPLUS TMINUS TMUL TDIV
-
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TLBRACK TRBRACK
+%token <token> TOR TAND TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL TPLUS TMINUS TMUL TDIV
 %token <token> TCOMMA TDOT TSEMICOLON
+
 
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
@@ -46,16 +42,23 @@
  */
 %type <type> type
 %type <ident> ident
-%type <expr> numeric expr 
+%type <expr> numeric expr logic_expr
 %type <varvec> func_decl_args
 %type <exprvec> call_args
 %type <block> program stmts block
-%type <stmt> stmt var_decl func_decl
+%type <stmt> stmt var_decl func_decl condition
 %type <token> comparison
 
 /* Operator precedence for mathematical operators */
+%right TEQUAL
+%left TAND TOR
+%left TCEQ TCNE TCLT TCLE TCGT TCGE
 %left TPLUS TMINUS
 %left TMUL TDIV
+
+// [Lex & Yacc | Yacc If-Else Ambiguity](https://www.epaperpress.com/lexandyacc/if.html)
+%nonassoc TIFX
+%nonassoc TELSE
 
 %start program
 
@@ -71,6 +74,7 @@ stmts : stmt { fprintf(stderr, "stmts->stmt\n"); $$ = new NBlock(); $$->statemen
 stmt : func_decl { fprintf(stderr, "stmt->func_decl\n"); }
      | var_decl TSEMICOLON { fprintf(stderr, "stmt->var_decl TSEMICOLON\n"); }
      | expr TSEMICOLON { fprintf(stderr, "stmt->expr TSEMICOLON\n"); $$ = new NExpressionStatement(*$1); }
+     | condition { fprintf(stderr, "stmt->condition\n"); }
      ;
 
 block : TLBRACE stmts TRBRACE { fprintf(stderr, "block->TLBRACE stmts TRBRACE"); $$ = $2; }
@@ -107,17 +111,27 @@ expr : ident TEQUAL expr { fprintf(stderr, "expr->ident TEQUAL expr\n"); $$ = ne
      | ident TLPAREN call_args TRPAREN { fprintf(stderr, "expr->ident TLPAREN call_args TRPAREN\n"); $$ = new NMethodCall(*$1, *$3); delete $3; }
      | ident { fprintf(stderr, "expr->ident\n"); $<ident>$ = $1; }
      | numeric { fprintf(stderr, "expr->numeric\n"); }
-     | expr comparison expr { fprintf(stderr, "expr->expr comparison expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
+     | expr TPLUS expr { fprintf(stderr, "expr->expr TPLUS expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
+     | expr TMINUS expr { fprintf(stderr, "expr->expr TMINUS expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
+     | expr TMUL expr { fprintf(stderr, "expr->expr TMUL expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
+     | expr TDIV expr { fprintf(stderr, "expr->expr TDIV expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
      | TLPAREN expr TRPAREN { fprintf(stderr, "expr->TLPAREN expr TRPAREN\n"); $$ = $2; }
      ;
+
+logic_expr: logic_expr TAND logic_expr { fprintf(stderr, "logic_expr->logic_expr TAND logic_expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
+          | logic_expr TOR logic_expr { fprintf(stderr, "logic_expr->logic_expr TOR logic_expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
+          | expr comparison expr { fprintf(stderr, "logic_expr->expr comparison expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
     
 call_args : /*blank*/  { $$ = new ExpressionList(); }
           | expr { $$ = new ExpressionList(); $$->push_back($1); }
           | call_args TCOMMA expr  { $1->push_back($3); }
           ;
 
-comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE 
-           | TPLUS | TMINUS | TMUL | TDIV
+comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE
            ;
+
+condition: TIF TLPAREN logic_expr TRPAREN block %prec TIFX   { $$ = new NIfStatement(*$3, $5); }
+         | TIF TLPAREN logic_expr TRPAREN block TELSE block { $$ = new NIfStatement(*$3, $5, $7); }
+         ;
 
 %%

@@ -87,6 +87,30 @@ void NBinaryOperator::codeGen(CodeGenContext &context)
     case TDIV:
         context.code << " / ";
         break;
+    case TCEQ:
+        context.code << " == ";
+        break;
+    case TCNE:
+        context.code << " != ";
+        break;
+    case TCLT:
+        context.code << " < ";
+        break;
+    case TCLE:
+        context.code << " <= ";
+        break;
+    case TCGT:
+        context.code << " > ";
+        break;
+    case TCGE:
+        context.code << " >= ";
+        break;
+    case TAND:
+        context.code << " and ";
+        break;
+    case TOR:
+        context.code << " or ";
+        break;
     }
 
     rhs.codeGen(context);
@@ -104,6 +128,7 @@ void NBlock::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating block" << std::endl;
     context.indent++;
+    std::cerr << "Current indents: " << context.indent << std::endl;
 
     StatementList::const_iterator it;
     for (it = statements.begin(); it != statements.end(); it++)
@@ -113,6 +138,12 @@ void NBlock::codeGen(CodeGenContext &context)
         (**it).codeGen(context);
     }
 
+    if (statements.size() == 0)
+    {
+        context.code << std::string(context.indent, '\t') << "pass" << std::endl;
+    }
+
+    std::cerr << "Current indents: " << context.indent << std::endl;
     context.indent--;
 }
 
@@ -154,6 +185,22 @@ void NFunctionDeclaration::codeGen(CodeGenContext &context)
 
     block.codeGen(context);
 
-    context.code << std::endl
-                 << std::endl;
+    context.code << std::endl;
+}
+
+void NIfStatement::codeGen(CodeGenContext &context)
+{
+    std::cerr << "Creating if statement" << std::endl;
+
+    context.code << "if ";
+    condition.codeGen(context);
+    context.code << ":" << std::endl;
+
+    trueBlock->codeGen(context);
+
+    if (falseBlock != nullptr)
+    {
+        context.code << std::string(context.indent, '\t') << "else:" << std::endl;
+        falseBlock->codeGen(context);
+    }
 }

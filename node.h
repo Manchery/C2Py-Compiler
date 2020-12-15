@@ -140,4 +140,16 @@ public:
     virtual void codeGen(CodeGenContext &context);
 };
 
+class NIfStatement : public NStatement
+{
+public:
+    NExpression &condition;
+    NBlock *trueBlock;
+    NBlock *falseBlock;
+    NIfStatement(NExpression &condition,
+                 NBlock *trueBlock,
+                 NBlock *falseBlock = nullptr) : condition(condition), trueBlock(trueBlock), falseBlock(falseBlock) {}
+    virtual void codeGen(CodeGenContext &context);
+};
+
 #endif

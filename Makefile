@@ -12,4 +12,4 @@ tokens.cpp: tokens.l parser.hpp
 	lex -d -o $@ $^
 
 parser: parser.cpp codegen.cpp main.cpp tokens.cpp
-	g++ -g -o $@ $^ -DYYDEBUG=1
+	g++ -g -o $@ $^ -DYYDEBUG=1 -std=c++11

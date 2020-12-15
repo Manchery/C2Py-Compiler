@@ -15,6 +15,7 @@ class NBlock;
 
 class CodeGenContext
 {
+public:
     // std::stack<CodeGenBlock *> blocks;
     // Function *mainFunction;
     int indent;
@@ -44,18 +45,4 @@ public:
     //     blocks.pop();
     //     delete top;
     // }
-
-    friend class Node;
-    friend class NExpression;
-    friend class NStatement;
-    friend class NInteger;
-    friend class NDouble;
-    friend class NIdentifier;
-    friend class NMethodCall;
-    friend class NBinaryOperator;
-    friend class NAssignment;
-    friend class NBlock;
-    friend class NExpressionStatement;
-    friend class NVariableDeclaration;
-    friend class NFunctionDeclaration;
 };
