@@ -77,16 +77,37 @@ void NMethodCall::codeGen(CodeGenContext &context)
     if (id.name == "printf")
     {
         context.code << "printf("
-                     << "r\"" << (dynamic_cast<NString *>(arguments[0]))->value << "\"";
-        ExpressionList::const_iterator it;
-        for (it = arguments.begin(); it != arguments.end(); it++)
+                     << "\"" << (dynamic_cast<NString *>(arguments[0]))->value << "\""
+                     << ", (";
+        ExpressionList::const_iterator it = arguments.begin();
+        bool first = true;
+        for (it++; it != arguments.end(); it++)
         {
-            if (it == arguments.begin())
-                continue;
-            context.code << ", ";
+            if (!first)
+                context.code << ", ";
+            first = false;
             (**it).codeGen(context);
         }
-        context.code << ")";
+        context.code << "))";
+        return;
+    }
+
+    if (id.name == "scanf")
+    {
+        context.code << "[";
+        ExpressionList::const_iterator it = arguments.begin();
+        bool first = true;
+        for (it++; it != arguments.end(); it++)
+        {
+            if (!first)
+                context.code << ", ";
+            first = false;
+            (**it).codeGen(context);
+        }
+        context.code << "] = ";
+        context.code << "scanf("
+                     << "\"" << (dynamic_cast<NString *>(arguments[0]))->value << "\""
+                     << ")";
         return;
     }
 

@@ -32,6 +32,7 @@
 %token <token> TIF TELSE TFOR TWHILE
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TLBRACK TRBRACK
 %token <token> TOR TAND TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL TPLUS TMINUS TMUL TDIV
+%token <token> TAMPERSAND
 %token <token> TCOMMA TDOT TSEMICOLON
 
 
@@ -41,8 +42,8 @@
    calling an (NIdentifier*). It makes the compiler happy.
  */
 %type <type> type
-%type <ident> ident
-%type <expr> numeric expr logic_expr
+%type <ident> ident ptr   //! ptr: ONLY FOR scanf
+%type <expr> numeric expr logic_expr 
 %type <varvec> func_decl_args
 %type <exprvec> call_args
 %type <block> program stmts block
@@ -109,9 +110,12 @@ type: TINTTYPE        { $$ = INT; }
     | TVOIDTYPE       { $$ = VOID; }
     ;
 
+ptr : TAMPERSAND TIDENTIFIER { fprintf(stderr, "ptr->TAMPERSAND indent\n"); $$ = new NIdentifier(*$2); delete $2; }
+
 expr : ident TEQUAL expr { fprintf(stderr, "expr->ident TEQUAL expr\n"); $$ = new NAssignment(*$<ident>1, *$3); }
      | ident TLPAREN call_args TRPAREN { fprintf(stderr, "expr->ident TLPAREN call_args TRPAREN\n"); $$ = new NMethodCall(*$1, *$3); delete $3; }
      | ident { fprintf(stderr, "expr->ident\n"); $<ident>$ = $1; }
+     | ptr { fprintf(stderr, "expr->ptr\n"); $<ident>$ = $1; }
      | numeric { fprintf(stderr, "expr->numeric\n"); }
      | expr TPLUS expr { fprintf(stderr, "expr->expr TPLUS expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
      | expr TMINUS expr { fprintf(stderr, "expr->expr TMINUS expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }

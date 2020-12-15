@@ -28,7 +28,7 @@ def scanf(format: str):
 
 
 def printf(format: str, values: list):
-    print(format % values)
+    print(format % values, end='')
 
 
 def atoi(chars: list):
@@ -42,10 +42,10 @@ def atoi(chars: list):
     return num * sgn
 
 
-# [a, b] = scanf(r"%s %d")
-# [c, d] = scanf(r"%d %d")
+# [a, b] = scanf("%s %d")
+# [c, d] = scanf("%d %d")
 
-# printf(r"a=%s, b=%d, c=%d, d=%d", (a, b, c, d))
+# printf("a=%s, b=%d, c=%d, d=%d", (a, b, c, d))
 
 # print(atoi(['-', '1', '2']))
 # print(atoi(['9', '0', '1']))

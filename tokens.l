@@ -40,6 +40,8 @@ extern "C" int yywrap() { }
 "&&"                                    return TOKEN(TAND);
 "||"                                    return TOKEN(TOR);
 
+"&"                                     return TOKEN(TAMPERSAND);
+
 "("                                     return TOKEN(TLPAREN);
 ")"                                     return TOKEN(TRPAREN);
 "{"                                     return TOKEN(TLBRACE);
