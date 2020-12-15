@@ -125,7 +125,7 @@ void NExpressionStatement::codeGen(CodeGenContext &context)
 
 void NVariableDeclaration::codeGen(CodeGenContext &context)
 {
-    std::cerr << "Creating variable declaration " << type.type << " " << id.name << std::endl;
+    std::cerr << "Creating variable declaration " << type << " " << id.name << std::endl;
     if (assignmentExpr != NULL)
     {
         NAssignment assn(id, *assignmentExpr);

@@ -11,7 +11,6 @@
 /* Represents the many different ways we can access our data */
 %union {
     Node *node;
-    NType *type;
     NBlock *block;
     NExpression *expr;
     NStatement *stmt;
@@ -21,6 +20,7 @@
     std::vector<NExpression*> *exprvec;
     std::string *string;
     int token;
+    ExprType type;
 }
 
 /* Define our terminal symbols (tokens). This should
@@ -77,12 +77,12 @@ block : TLBRACE stmts TRBRACE { fprintf(stderr, "block->TLBRACE stmts TRBRACE");
       | TLBRACE TRBRACE { $$ = new NBlock(); }
       ;
 
-var_decl : type ident { fprintf(stderr, "var_decl->ident ident\n"); $$ = new NVariableDeclaration(*$1, *$2); }
-         | type ident TEQUAL expr { fprintf(stderr, "var_decl->ident ident TEQUAL expr\n"); $$ = new NVariableDeclaration(*$1, *$2, $4); }
+var_decl : type ident { fprintf(stderr, "var_decl->ident ident\n"); $$ = new NVariableDeclaration($1, *$2); }
+         | type ident TEQUAL expr { fprintf(stderr, "var_decl->ident ident TEQUAL expr\n"); $$ = new NVariableDeclaration($1, *$2, $4); }
          ;
         
 func_decl : type ident TLPAREN func_decl_args TRPAREN block 
-            { $$ = new NFunctionDeclaration(*$1, *$2, *$4, *$6); delete $4; }
+            { $$ = new NFunctionDeclaration($1, *$2, *$4, *$6); delete $4; }
           ;
     
 func_decl_args : /*blank*/  { $$ = new VariableList(); }
@@ -97,12 +97,12 @@ numeric: TINTEGER     { fprintf(stderr, "numeric->TINTEGER %s\n", $1->c_str()); 
        | TDOUBLE      { fprintf(stderr, "numeric->TDOUBLE %s\n", $1->c_str()); $$ = new NDouble(atof($1->c_str())); delete $1; }
        ;
 
-type: TINTTYPE        { $$ = new NType(INT); }
-    | TDOUBLETYPE     { $$ = new NType(DOUBLE); }
-    | TCHARTYPE       { $$ = new NType(CHAR); }
-    | TVOIDTYPE       { $$ = new NType(VOID); }
+type: TINTTYPE        { $$ = INT; }
+    | TDOUBLETYPE     { $$ = DOUBLE; }
+    | TCHARTYPE       { $$ = CHAR; }
+    | TVOIDTYPE       { $$ = VOID; }
     ;
-    
+
 expr : ident TEQUAL expr { fprintf(stderr, "expr->ident TEQUAL expr\n"); $$ = new NAssignment(*$<ident>1, *$3); }
      | ident TLPAREN call_args TRPAREN { fprintf(stderr, "expr->ident TLPAREN call_args TRPAREN\n"); $$ = new NMethodCall(*$1, *$3); delete $3; }
      | ident { fprintf(stderr, "expr->ident\n"); $<ident>$ = $1; }

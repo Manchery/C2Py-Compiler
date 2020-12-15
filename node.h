@@ -116,33 +116,26 @@ public:
     virtual void codeGen(CodeGenContext &context);
 };
 
-class NType : public Node
-{
-public:
-    ExprType type;
-    NType(ExprType type) : type(type) {}
-};
-
 class NVariableDeclaration : public NStatement
 {
 public:
-    // TODO: check type.type & assignmentExpr.type
-    const NType &type;
+    // TODO: check type & assignmentExpr.type
+    ExprType type;
     NIdentifier &id;
     NExpression *assignmentExpr;
-    NVariableDeclaration(const NType &type, NIdentifier &id) : type(type), id(id) {}
-    NVariableDeclaration(const NType &type, NIdentifier &id, NExpression *assignmentExpr) : type(type), id(id), assignmentExpr(assignmentExpr) {}
+    NVariableDeclaration(ExprType type, NIdentifier &id) : type(type), id(id) {}
+    NVariableDeclaration(ExprType type, NIdentifier &id, NExpression *assignmentExpr) : type(type), id(id), assignmentExpr(assignmentExpr) {}
     virtual void codeGen(CodeGenContext &context);
 };
 
 class NFunctionDeclaration : public NStatement
 {
 public:
-    const NType &type;
+    ExprType type;
     const NIdentifier &id;
     VariableList arguments;
     NBlock &block;
-    NFunctionDeclaration(const NType &type, const NIdentifier &id,
+    NFunctionDeclaration(ExprType type, const NIdentifier &id,
                          const VariableList &arguments, NBlock &block) : type(type), id(id), arguments(arguments), block(block) {}
     virtual void codeGen(CodeGenContext &context);
 };
