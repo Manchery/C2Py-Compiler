@@ -63,6 +63,18 @@ public:
     virtual void codeGen(CodeGenContext &context);
 };
 
+class NString : public NExpression
+{
+public:
+    std::string value;
+    NString(const std::string &value) : value(value)
+    {
+        type = STR;
+        std::cerr << value << std::endl;
+    }
+    virtual void codeGen(CodeGenContext &context);
+};
+
 class NIdentifier : public NExpression
 {
 public:

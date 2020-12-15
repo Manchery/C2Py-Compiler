@@ -47,5 +47,5 @@ def atoi(chars: list):
 
 # printf(r"a=%s, b=%d, c=%d, d=%d", (a, b, c, d))
 
-print(atoi(['-', '1', '2']))
-print(atoi(['9', '0', '1']))
+# print(atoi(['-', '1', '2']))
+# print(atoi(['9', '0', '1']))

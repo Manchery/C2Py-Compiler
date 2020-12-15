@@ -23,6 +23,9 @@ std::ostream &operator<<(std::ostream &os, ExprType type)
 void CodeGenContext::generateCode(NBlock &root)
 {
     std::cerr << "Generating code...n" << std::endl;
+    code << "from utils import *" << std::endl
+         << std::endl;
+
     root.codeGen(*this); /* emit bytecode for the toplevel block */
 
     code << "if __name__ == '__main__':\n\tmain()" << std::endl;
@@ -47,6 +50,20 @@ void NDouble::codeGen(CodeGenContext &context)
     context.code << value;
 }
 
+void NString::codeGen(CodeGenContext &context)
+{
+    std::cerr << "Creating string: " << value << std::endl;
+
+    context.code << "[";
+    for (int i = 0; i < value.length(); i++)
+    {
+        if (i > 0)
+            context.code << ", ";
+        context.code << "'" << value[i] << "'";
+    }
+    context.code << "]";
+}
+
 void NIdentifier::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating identifier reference: " << name << std::endl;
@@ -55,7 +72,24 @@ void NIdentifier::codeGen(CodeGenContext &context)
 
 void NMethodCall::codeGen(CodeGenContext &context)
 {
-    std::cerr << "Creating method call: " << id.name << std::endl;
+    std::cerr << "Creating method call: " << id.name << ", " << arguments.size() << " arguments" << std::endl;
+
+    if (id.name == "printf")
+    {
+        context.code << "printf("
+                     << "r\"" << (dynamic_cast<NString *>(arguments[0]))->value << "\"";
+        ExpressionList::const_iterator it;
+        for (it = arguments.begin(); it != arguments.end(); it++)
+        {
+            if (it == arguments.begin())
+                continue;
+            context.code << ", ";
+            (**it).codeGen(context);
+        }
+        context.code << ")";
+        return;
+    }
+
     context.code << id.name << "(";
     ExpressionList::const_iterator it;
     for (it = arguments.begin(); it != arguments.end(); it++)

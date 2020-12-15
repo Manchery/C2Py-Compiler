@@ -11,7 +11,14 @@ extern NBlock *programBlock;
 
 int main(int argc, char **argv)
 {
-    freopen("in.txt", "r", stdin);
+    if (argc >= 2)
+    {
+        freopen(argv[1], "r", stdin);
+    }
+    else
+    {
+        freopen("in.txt", "r", stdin);
+    }
     freopen("out.py", "w", stdout);
     yyparse();
     std::cerr << programBlock << std::endl;

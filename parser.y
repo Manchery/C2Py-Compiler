@@ -100,6 +100,7 @@ ident : TIDENTIFIER { std::cerr<<"ident->"<<*$1<<std::endl; $$ = new NIdentifier
 
 numeric: TINTEGER     { fprintf(stderr, "numeric->TINTEGER %s\n", $1->c_str()); $$ = new NInteger(atol($1->c_str())); delete $1; }
        | TDOUBLE      { fprintf(stderr, "numeric->TDOUBLE %s\n", $1->c_str()); $$ = new NDouble(atof($1->c_str())); delete $1; }
+       | TSTRING      { fprintf(stderr, "numeric->TSTRING %s\n", $1->c_str()); $$ = new NString($1->substr(1, $1->length()-2)); delete $1; }
        ;
 
 type: TINTTYPE        { $$ = INT; }
@@ -124,8 +125,8 @@ logic_expr: logic_expr TAND logic_expr { fprintf(stderr, "logic_expr->logic_expr
           | expr comparison expr { fprintf(stderr, "logic_expr->expr comparison expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
     
 call_args : /*blank*/  { $$ = new ExpressionList(); }
-          | expr { $$ = new ExpressionList(); $$->push_back($1); }
-          | call_args TCOMMA expr  { $1->push_back($3); }
+          | expr { fprintf(stderr, "call_args->expr\n"); $$ = new ExpressionList(); $$->push_back($1); }
+          | call_args TCOMMA expr  { fprintf(stderr, "call_args->call_args TCOMMA expr\n"); $1->push_back($3); }
           ;
 
 comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE
