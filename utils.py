@@ -31,7 +31,21 @@ def printf(format: str, values: list):
     print(format % values)
 
 
-[a, b] = scanf(r"%s %d")
-[c, d] = scanf(r"%d %d")
+def atoi(chars: list):
+    sgn = 1
+    num = 0
+    if chars[0] == '-':
+        chars = chars[1:]
+        sgn = -1
+    for x in chars:
+        num = num * 10 + ord(x) - ord('0')
+    return num * sgn
 
-printf(r"a=%s, b=%d, c=%d, d=%d", (a, b, c, d))
+
+# [a, b] = scanf(r"%s %d")
+# [c, d] = scanf(r"%d %d")
+
+# printf(r"a=%s, b=%d, c=%d, d=%d", (a, b, c, d))
+
+print(atoi(['-', '1', '2']))
+print(atoi(['9', '0', '1']))
