@@ -193,4 +193,12 @@ public:
     virtual void codeGen(CodeGenContext &context);
 };
 
+class NReturnStatement : public NStatement
+{
+public:
+    NExpression *value;
+    NReturnStatement(NExpression *value) : value(value) {}
+    virtual void codeGen(CodeGenContext &context);
+};
+
 #endif

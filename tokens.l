@@ -16,6 +16,7 @@ extern "C" int yywrap() { }
 "else"                                  return TOKEN(TELSE);
 "for"                                   return TOKEN(TFOR);
 "while"                                 return TOKEN(TWHILE);
+"return"                                return TOKEN(TRETURN);
 
 "int"                                   SAVE_TOKEN; return TINTTYPE; 
 "double"                                SAVE_TOKEN; return TDOUBLETYPE;

@@ -235,6 +235,8 @@ void NFunctionDeclaration::codeGen(CodeGenContext &context)
     for (it = arguments.begin(); it != arguments.end(); it++)
     {
         // (**it).codeGen(context);
+        if (it != arguments.begin())
+            context.code << ", ";
         context.code << (**it).id.name;
     }
     context.code << "):" << std::endl;
@@ -293,4 +295,14 @@ void NWhileStatement::codeGen(CodeGenContext &context)
     context.code << ":" << std::endl;
 
     block->codeGen(context);
+}
+
+void NReturnStatement::codeGen(CodeGenContext &context)
+{
+    std::cerr << "Creating return statement" << std::endl;
+
+    context.code << "return ";
+    value->codeGen(context);
+
+    context.code << std::endl;
 }

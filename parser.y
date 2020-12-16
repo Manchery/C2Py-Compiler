@@ -29,7 +29,7 @@
  */
 %token <string> TIDENTIFIER TINTEGER TDOUBLE TCHAR TSTRING
 %token <token> TINTTYPE TDOUBLETYPE TCHARTYPE TVOIDTYPE
-%token <token> TIF TELSE TFOR TWHILE
+%token <token> TIF TELSE TFOR TWHILE TRETURN
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TLBRACK TRBRACK
 %token <token> TOR TAND TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL TPLUS TMINUS TMUL TDIV
 %token <token> TAMPERSAND
@@ -47,7 +47,7 @@
 %type <varvec> func_decl_args
 %type <exprvec> call_args
 %type <block> program stmts block
-%type <stmt> stmt var_decl func_decl condition loop
+%type <stmt> stmt var_decl func_decl condition loop return
 %type <token> comparison
 
 /* Operator precedence for mathematical operators */
@@ -77,6 +77,7 @@ stmt : func_decl { fprintf(stderr, "stmt->func_decl\n"); }
      | expr TSEMICOLON { fprintf(stderr, "stmt->expr TSEMICOLON\n"); $$ = new NExpressionStatement(*$1); }
      | condition { fprintf(stderr, "stmt->condition\n"); }
      | loop { fprintf(stderr, "stmt->loop\n"); }
+     | return { fprintf(stderr, "stmt->return\n"); }
      ;
 
 block : TLBRACE stmts TRBRACE { fprintf(stderr, "block->TLBRACE stmts TRBRACE"); $$ = $2; }
@@ -143,5 +144,8 @@ condition: TIF TLPAREN logic_expr TRPAREN block %prec TIFX   { $$ = new NIfState
 loop : TFOR TLPAREN expr TSEMICOLON logic_expr TSEMICOLON expr TRPAREN block { $$ = new NForStatement($3, $5, $7, $9); }
      | TFOR TLPAREN var_decl TSEMICOLON logic_expr TSEMICOLON expr TRPAREN block { $$ = new NForStatement($3, $5, $7, $9); }
      | TWHILE TLPAREN logic_expr TRPAREN block { $$ = new NWhileStatement($3, $5); }
+
+
+return : TRETURN expr TSEMICOLON { $$ = new NReturnStatement($2); }
 
 %%
