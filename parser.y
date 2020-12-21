@@ -47,7 +47,7 @@
 %type <varvec> func_decl_args
 %type <exprvec> call_args
 %type <block> program stmts block
-%type <stmt> stmt var_decl func_decl condition loop return
+%type <stmt> stmt var_decl func_decl condition loop return array_decl
 %type <token> comparison
 
 /* Operator precedence for mathematical operators */
@@ -78,6 +78,7 @@ stmt : func_decl { fprintf(stderr, "stmt->func_decl\n"); }
      | condition { fprintf(stderr, "stmt->condition\n"); }
      | loop { fprintf(stderr, "stmt->loop\n"); }
      | return { fprintf(stderr, "stmt->return\n"); }
+     | array_decl TSEMICOLON { fprintf(stderr, "stmt->array_decl TSEMICOLON\n"); }
      ;
 
 block : TLBRACE stmts TRBRACE { fprintf(stderr, "block->TLBRACE stmts TRBRACE"); $$ = $2; }
@@ -123,6 +124,7 @@ expr : ident TEQUAL expr { fprintf(stderr, "expr->ident TEQUAL expr\n"); $$ = ne
      | expr TMUL expr { fprintf(stderr, "expr->expr TMUL expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
      | expr TDIV expr { fprintf(stderr, "expr->expr TDIV expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
      | TLPAREN expr TRPAREN { fprintf(stderr, "expr->TLPAREN expr TRPAREN\n"); $$ = $2; }
+     | ident TLBRACK expr TRBRACK { fprintf(stderr, "array ident[expr]\n"); $$ = new NArrayVariable(*$1, *$3); }
      ;
 
 logic_expr: logic_expr TAND logic_expr { fprintf(stderr, "logic_expr->logic_expr TAND logic_expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
@@ -144,8 +146,15 @@ condition: TIF TLPAREN logic_expr TRPAREN block %prec TIFX   { $$ = new NIfState
 loop : TFOR TLPAREN expr TSEMICOLON logic_expr TSEMICOLON expr TRPAREN block { $$ = new NForStatement($3, $5, $7, $9); }
      | TFOR TLPAREN var_decl TSEMICOLON logic_expr TSEMICOLON expr TRPAREN block { $$ = new NForStatement($3, $5, $7, $9); }
      | TWHILE TLPAREN logic_expr TRPAREN block { $$ = new NWhileStatement($3, $5); }
+     ;
 
 
 return : TRETURN expr TSEMICOLON { $$ = new NReturnStatement($2); }
+       | TRETURN TSEMICOLON { $$ = new NReturnStatement(); }
+       ;
+
+
+array_decl : type ident TLBRACK expr TRBRACK { $$ = new NArrayDeclaration($1, *$2, $4); }
+           ;
 
 %%

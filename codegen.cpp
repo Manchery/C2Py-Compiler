@@ -302,7 +302,37 @@ void NReturnStatement::codeGen(CodeGenContext &context)
     std::cerr << "Creating return statement" << std::endl;
 
     context.code << "return ";
-    value->codeGen(context);
+
+    if (value)
+    {
+        value->codeGen(context);
+    }
 
     context.code << std::endl;
+}
+
+void NArrayDeclaration::codeGen(CodeGenContext &context)
+{
+    std::cerr << "Creating array statement" << std::endl;
+
+    id.codeGen(context);
+
+    context.code << " = [None] * ";
+
+    lengthExpr->codeGen(context);
+
+    context.code << std::endl;
+}
+
+void NArrayVariable::codeGen(CodeGenContext &context)
+{
+    std::cerr << "Creating array variable" << std::endl;
+
+    id.codeGen(context);
+
+    context.code << "[";
+
+    indexExpr.codeGen(context);
+
+    context.code << "]";
 }

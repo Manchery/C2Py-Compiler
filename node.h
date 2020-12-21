@@ -197,7 +197,28 @@ class NReturnStatement : public NStatement
 {
 public:
     NExpression *value;
-    NReturnStatement(NExpression *value) : value(value) {}
+    NReturnStatement(NExpression *value = nullptr) : value(value) {}
+    virtual void codeGen(CodeGenContext &context);
+};
+
+class NArrayDeclaration : public NStatement
+{
+public:
+    // TODO: check type & assignmentExpr.type
+    ExprType type;
+    NIdentifier &id;
+    NExpression *lengthExpr;
+    NArrayDeclaration(ExprType type, NIdentifier &id, NExpression *lengthExpr) : type(type), id(id), lengthExpr(lengthExpr) {}
+    virtual void codeGen(CodeGenContext &context);
+};
+
+class NArrayVariable : public NExpression
+{
+public:
+    // TODO: check type & assignmentExpr.type
+    NIdentifier &id;
+    NExpression &indexExpr;
+    NArrayVariable(NIdentifier &id, NExpression &indexExpr) : id(id), indexExpr(indexExpr) {}
     virtual void codeGen(CodeGenContext &context);
 };
 

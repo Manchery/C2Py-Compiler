@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
 import re
 
 __SCANF_BUFFER_2018013418__ = ""
@@ -20,6 +23,9 @@ def scanf(format: str):
             for s, g in zip(specifiers, match.groups()):
                 if s == r"%d":
                     targets.append(eval(g))
+                elif s == r"%s":
+                    charList = [g[i] for i in range(len(g))]
+                    targets.append(charList)
                 else:
                     targets.append(g)
             return targets
@@ -40,6 +46,9 @@ def atoi(chars: list):
     for x in chars:
         num = num * 10 + ord(x) - ord('0')
     return num * sgn
+
+def strlen(string: list):
+    return len(list(filter(None, string)))
 
 
 # [a, b] = scanf("%s %d")
