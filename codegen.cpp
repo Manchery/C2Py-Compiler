@@ -64,6 +64,13 @@ void NString::codeGen(CodeGenContext &context)
     context.code << "]";
 }
 
+void NChar::codeGen(CodeGenContext &context)
+{
+    std::cerr << "Creating char: " << value << std::endl;
+
+    context.code << "'" << value << "'";
+}
+
 void NIdentifier::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating identifier reference: " << name << std::endl;
@@ -175,7 +182,16 @@ void NBinaryOperator::codeGen(CodeGenContext &context)
 void NAssignment::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating assignment for " << lhs.name << std::endl;
-    context.code << lhs.name << " = ";
+    if (this->isArrayVariable)
+    {
+        variable.codeGen(context);
+        context.code << " = ";
+    }
+    else
+    {
+
+        context.code << lhs.name << " = ";
+    }
     rhs.codeGen(context);
 }
 

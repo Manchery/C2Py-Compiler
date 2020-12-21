@@ -75,6 +75,18 @@ public:
     virtual void codeGen(CodeGenContext &context);
 };
 
+class NChar : public NExpression
+{
+public:
+    char value;
+    NChar(char value) : value(value)
+    {
+        type = CHAR;
+        std::cerr << value << std::endl;
+    }
+    virtual void codeGen(CodeGenContext &context);
+};
+
 class NIdentifier : public NExpression
 {
 public:
@@ -103,12 +115,26 @@ public:
     virtual void codeGen(CodeGenContext &context);
 };
 
+class NArrayVariable : public NExpression
+{
+public:
+    // TODO: check type & assignmentExpr.type
+    NIdentifier &id;
+    NExpression &indexExpr;
+    NArrayVariable(NIdentifier &id, NExpression &indexExpr) : id(id), indexExpr(indexExpr) {}
+    virtual void codeGen(CodeGenContext &context);
+};
+
 class NAssignment : public NExpression
 {
 public:
+    bool isArrayVariable;
     NIdentifier &lhs;
     NExpression &rhs;
-    NAssignment(NIdentifier &lhs, NExpression &rhs) : lhs(lhs), rhs(rhs) {}
+    NArrayVariable variable;
+    NAssignment(NIdentifier &lhs, NExpression &rhs) : lhs(lhs), rhs(rhs), isArrayVariable(false), variable(lhs, rhs) {}
+    NAssignment(NIdentifier &lhs, NExpression &rhs, NExpression &index) : lhs(lhs), rhs(rhs), isArrayVariable(true), variable(lhs, index) {}
+
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -212,14 +238,5 @@ public:
     virtual void codeGen(CodeGenContext &context);
 };
 
-class NArrayVariable : public NExpression
-{
-public:
-    // TODO: check type & assignmentExpr.type
-    NIdentifier &id;
-    NExpression &indexExpr;
-    NArrayVariable(NIdentifier &id, NExpression &indexExpr) : id(id), indexExpr(indexExpr) {}
-    virtual void codeGen(CodeGenContext &context);
-};
 
 #endif

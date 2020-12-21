@@ -38,12 +38,15 @@ def printf(format: str, values: list):
 
 
 def atoi(chars: list):
+    # print('what', chars)
     sgn = 1
     num = 0
     if chars[0] == '-':
         chars = chars[1:]
         sgn = -1
     for x in chars:
+        if x == 0:
+            break
         num = num * 10 + ord(x) - ord('0')
     return num * sgn
 

@@ -51,8 +51,6 @@ double calc(double a, double b, char op)
     }
 }
 
-// minus number?
-// maybe bugging, need duipai
 int main()
 {
     scanf("%s", expr);
@@ -64,9 +62,9 @@ int main()
     char numBuffer[500];
     int bufPtr = 0;
 
-    for (int i = 0; i < len; i++)
+    for (int i = 0; i < len; i = i + 1)
     {
-        if (isOp(expr[i]))
+        if (isOp(expr[i]) == 1)
         {
             if (bufPtr > 0)
             {

@@ -1,6 +1,7 @@
 #include "node.h"
 #include <stack>
 #include <sstream>
+#include <vector>
 
 std::ostream &operator<<(std::ostream &os, ExprType type);
 

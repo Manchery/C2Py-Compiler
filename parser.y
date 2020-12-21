@@ -104,6 +104,7 @@ ident : TIDENTIFIER { std::cerr<<"ident->"<<*$1<<std::endl; $$ = new NIdentifier
 numeric: TINTEGER     { fprintf(stderr, "numeric->TINTEGER %s\n", $1->c_str()); $$ = new NInteger(atol($1->c_str())); delete $1; }
        | TDOUBLE      { fprintf(stderr, "numeric->TDOUBLE %s\n", $1->c_str()); $$ = new NDouble(atof($1->c_str())); delete $1; }
        | TSTRING      { fprintf(stderr, "numeric->TSTRING %s\n", $1->c_str()); $$ = new NString($1->substr(1, $1->length()-2)); delete $1; }
+       | TCHAR        { fprintf(stderr, "numeric->TCHAR %s\n", $1->c_str()); $$ = new NChar((*$1)[1]); delete $1; }
        ;
 
 type: TINTTYPE        { $$ = INT; }
@@ -114,9 +115,11 @@ type: TINTTYPE        { $$ = INT; }
 
 ptr : TAMPERSAND TIDENTIFIER { fprintf(stderr, "ptr->TAMPERSAND indent\n"); $$ = new NIdentifier(*$2); delete $2; }
 
-expr : ident TEQUAL expr { fprintf(stderr, "expr->ident TEQUAL expr\n"); $$ = new NAssignment(*$<ident>1, *$3); }
+expr : logic_expr { fprintf(stderr, "expr->logic_expr\n"); }
+     | ident TEQUAL expr { fprintf(stderr, "expr->ident TEQUAL expr\n"); $$ = new NAssignment(*$<ident>1, *$3); }
+     | ident TLBRACK expr TRBRACK TEQUAL expr { fprintf(stderr, "array[expr] = expr\n"); $$ = new NAssignment(*$<ident>1, *$6, *$3); }
      | ident TLPAREN call_args TRPAREN { fprintf(stderr, "expr->ident TLPAREN call_args TRPAREN\n"); $$ = new NMethodCall(*$1, *$3); delete $3; }
-     | ident { fprintf(stderr, "expr->ident\n"); $<ident>$ = $1; }
+     | ident { fprintf(stderr, "expr->ident\n"); $<ident>$ = $1;}
      | ptr { fprintf(stderr, "expr->ptr\n"); $<ident>$ = $1; }
      | numeric { fprintf(stderr, "expr->numeric\n"); }
      | expr TPLUS expr { fprintf(stderr, "expr->expr TPLUS expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
@@ -130,6 +133,7 @@ expr : ident TEQUAL expr { fprintf(stderr, "expr->ident TEQUAL expr\n"); $$ = ne
 logic_expr: logic_expr TAND logic_expr { fprintf(stderr, "logic_expr->logic_expr TAND logic_expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
           | logic_expr TOR logic_expr { fprintf(stderr, "logic_expr->logic_expr TOR logic_expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
           | expr comparison expr { fprintf(stderr, "logic_expr->expr comparison expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
+          ;
     
 call_args : /*blank*/  { $$ = new ExpressionList(); }
           | expr { fprintf(stderr, "call_args->expr\n"); $$ = new ExpressionList(); $$->push_back($1); }
