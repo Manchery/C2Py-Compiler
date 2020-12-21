@@ -32,6 +32,7 @@ public:
     std::vector<std::vector<singleDeclaration>> stack;
     std::vector<std::string> errorMessage;
     std::vector<singleDeclaration> pendingLayer;
+    std::vector<std::string> funcDeclaration;
 
 public:
     // Module *module;
@@ -42,6 +43,7 @@ public:
     }
 
     singleDeclaration* findDeclaration(std::string name, int type);
+    int findLayerDeclaration(std::string name);
 
     void generateCode(NBlock &root);
     std::string outputCode();

@@ -26,6 +26,18 @@ int main(int argc, char **argv)
     CodeGenContext context;
     context.generateCode(*programBlock);
 
+    if (context.errorMessage.size() != 0)
+    {
+        std::cerr << "error occurred when compiling, stoppoing..." << std::endl;
+        for (auto msg : context.errorMessage)
+        {
+            std::cerr << msg << std::endl;
+        }
+        fclose(stdin);
+        fclose(stdout);
+        return -1;
+    }
+
     std::string code = context.outputCode();
     std::cout << code << std::endl;
 
