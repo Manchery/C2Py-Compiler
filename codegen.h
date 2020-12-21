@@ -14,6 +14,14 @@ class NBlock;
 //     std::map<std::string, Value *> locals;
 // };
 
+struct singleDeclaration
+{
+    public:
+        std::string newName, oldName;
+        ExprType type;
+        NIdentifier *expValue;
+};
+
 class CodeGenContext
 {
 public:
@@ -21,6 +29,9 @@ public:
     // Function *mainFunction;
     int indent;
     std::stringstream code;
+    std::vector<std::vector<singleDeclaration>> stack;
+    std::vector<std::string> errorMessage;
+    std::vector<singleDeclaration> pendingLayer;
 
 public:
     // Module *module;
@@ -29,6 +40,8 @@ public:
         indent = -1;
         // module = new Module("main", getGlobalContext());
     }
+
+    singleDeclaration* findDeclaration(std::string name, int type);
 
     void generateCode(NBlock &root);
     std::string outputCode();

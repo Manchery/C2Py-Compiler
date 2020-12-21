@@ -53,6 +53,9 @@ double calc(double a, double b, char op)
 
 int main()
 {
+    
+	abcd = 1;
+	int abcd;
     scanf("%s", expr);
     len = strlen(expr);
 

@@ -28,15 +28,10 @@ def calc(a, b, op):
 		return (a / b)
 
 def main():
-	global len
-	global expr
-	global opStack
-	global opTop
-	global numStack
-	global numTop
+	 = 1
+	abcd = None
 	[expr] = scanf("%s")
 	len = strlen(expr)
-	print('raw input', expr, len, [expr])
 	pointer = 0
 	num = 0
 	numBuffer = [None] * 500
@@ -47,7 +42,6 @@ def main():
 			if (bufPtr > 0):
 				numBuffer[bufPtr] = 0
 				bufPtr = 0
-				# print("lalalal", numBuffer)
 				numStack[numTop] = atoi(numBuffer)
 				numTop = (numTop + 1)
 			if (expr[i] != '('):

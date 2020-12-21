@@ -27,6 +27,7 @@ enum ExprType
     DOUBLE,
     CHAR,
     STR,
+    ARRAY,
     VOID
 };
 

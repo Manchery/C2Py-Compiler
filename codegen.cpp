@@ -73,8 +73,19 @@ void NChar::codeGen(CodeGenContext &context)
 
 void NIdentifier::codeGen(CodeGenContext &context)
 {
-    std::cerr << "Creating identifier reference: " << name << std::endl;
-    context.code << name;
+    auto oldDeclaration = context.findDeclaration(name, 1);
+    if (oldDeclaration == nullptr)
+    {
+        context.errorMessage.push_back("Can't find declaration of " + name);
+    }
+    else
+    {
+
+        std::cerr << "123Creating identifier reference: " << name << std::endl;
+        std::cerr << "lalalalallall" << oldDeclaration->newName << std::endl;
+        context.code << oldDeclaration->newName;
+        std::cerr << "lalalalallall" << name << std::endl;
+    }
 }
 
 void NMethodCall::codeGen(CodeGenContext &context)
@@ -117,6 +128,8 @@ void NMethodCall::codeGen(CodeGenContext &context)
                      << ")";
         return;
     }
+
+
 
     context.code << id.name << "(";
     ExpressionList::const_iterator it;
@@ -189,8 +202,8 @@ void NAssignment::codeGen(CodeGenContext &context)
     }
     else
     {
-
-        context.code << lhs.name << " = ";
+        lhs.codeGen(context);
+        context.code << " = ";
     }
     rhs.codeGen(context);
 }
@@ -199,6 +212,12 @@ void NBlock::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating block" << std::endl;
     context.indent++;
+    context.stack.push_back(std::vector<singleDeclaration>());
+    auto &layer = context.stack[context.stack.size() - 1];
+    for (int i=0;i<context.pendingLayer.size();i++){
+        layer.push_back(context.pendingLayer[i]);
+    }
+    context.pendingLayer.clear();
     std::cerr << "Current indents: " << context.indent << std::endl;
 
     StatementList::const_iterator it;
@@ -214,6 +233,13 @@ void NBlock::codeGen(CodeGenContext &context)
         context.code << std::string(context.indent, '\t') << "pass" << std::endl;
     }
 
+    // auto &layer = context.stack[context.stack.size() - 1];
+    // for (int i = 0; i < layer.size(); i++)
+    // {
+    //     auto *decl = &layer[i];
+    //     delete decl;
+    // }
+    context.stack.pop_back();
     std::cerr << "Leaving block" << std::endl;
     context.indent--;
     std::cerr << "Current indents: " << context.indent << std::endl;
@@ -226,8 +252,37 @@ void NExpressionStatement::codeGen(CodeGenContext &context)
     context.code << std::endl;
 }
 
+singleDeclaration *CodeGenContext::findDeclaration(std::string name, int type)
+{
+    for (int i = stack.size() - type; i >= 0; i--)
+    {
+        auto &layer = stack[i];
+        for (int j = layer.size() - 1; j >= 0; j--)
+        {
+            auto *decl = &layer[j];
+            if (decl->newName == name)
+            {
+                return decl;
+            }
+        }
+    }
+    std::cerr << "qwqwqwqwqwq    " << name << " " << std::endl;
+    return nullptr;
+}
+
 void NVariableDeclaration::codeGen(CodeGenContext &context)
 {
+    auto &layer = context.stack[context.stack.size() - 1];
+    auto oldDeclaration = context.findDeclaration(id.name, 2);
+    std::string newName = id.name;
+    if (oldDeclaration != nullptr)
+    {
+        newName = id.name + '_' + std::to_string(context.indent);
+    }
+    static int count = 0;
+    count++;
+    std::cerr << "performed times: " << std::to_string(count) << std::endl;
+    layer.push_back(singleDeclaration{newName, id.name, id.type, &id});
     std::cerr << "Creating variable declaration " << type << " " << id.name << std::endl;
     if (assignmentExpr != nullptr)
     {
@@ -236,7 +291,7 @@ void NVariableDeclaration::codeGen(CodeGenContext &context)
     }
     else
     {
-        context.code << id.name << " = None";
+        context.code << newName << " = None";
     }
     context.code << std::endl;
 }
@@ -250,10 +305,18 @@ void NFunctionDeclaration::codeGen(CodeGenContext &context)
     VariableList::const_iterator it;
     for (it = arguments.begin(); it != arguments.end(); it++)
     {
+        auto oldDeclaration = context.findDeclaration((**it).id.name, 2);
+        std::string newName = (**it).id.name;
+        if (oldDeclaration != nullptr)
+        {
+            newName = newName + '_' + std::to_string(context.indent);
+        }
+        context.pendingLayer.push_back(singleDeclaration{newName, (**it).id.name, (**it).id.type, &(**it).id});
+       
         // (**it).codeGen(context);
         if (it != arguments.begin())
             context.code << ", ";
-        context.code << (**it).id.name;
+        context.code << newName;
     }
     context.code << "):" << std::endl;
 
@@ -331,9 +394,16 @@ void NArrayDeclaration::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating array statement" << std::endl;
 
-    id.codeGen(context);
+    auto &layer = context.stack[context.stack.size() - 1];
+    auto oldDeclaration = context.findDeclaration(id.name, 2);
+    std::string newName = id.name;
+    if (oldDeclaration != nullptr)
+    {
+        newName = id.name + '_' + std::to_string(context.indent);
+    }
+    layer.push_back(singleDeclaration{newName, id.name, id.type, &id});
 
-    context.code << " = [None] * ";
+    context.code << newName << " = [None] * ";
 
     lengthExpr->codeGen(context);
 
@@ -345,6 +415,8 @@ void NArrayVariable::codeGen(CodeGenContext &context)
     std::cerr << "Creating array variable" << std::endl;
 
     id.codeGen(context);
+
+    std::cerr << "23333333333333333333Creating array variable" << std::endl;
 
     context.code << "[";
 
