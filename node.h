@@ -55,7 +55,11 @@ class NInteger : public NExpression
 {
 public:
     long long value;
-    NInteger(long long value) : value(value) { type = INT; }
+    NInteger(long long value) : value(value)
+    {
+        type = INT;
+        line = lineNumber;
+    }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -63,7 +67,11 @@ class NDouble : public NExpression
 {
 public:
     double value;
-    NDouble(double value) : value(value) { type = DOUBLE; }
+    NDouble(double value) : value(value)
+    {
+        type = DOUBLE;
+        line = lineNumber;
+    }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -71,7 +79,11 @@ class NString : public NExpression
 {
 public:
     std::string value;
-    NString(const std::string &value) : value(value) { type = STR; }
+    NString(const std::string &value) : value(value)
+    {
+        type = STR;
+        line = lineNumber;
+    }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -79,7 +91,11 @@ class NChar : public NExpression
 {
 public:
     char value;
-    NChar(char value) : value(value) { type = CHAR; }
+    NChar(char value) : value(value)
+    {
+        type = CHAR;
+        line = lineNumber;
+    }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -96,8 +112,8 @@ class NMethodCall : public NExpression
 public:
     const NIdentifier &id;
     ExpressionList arguments;
-    NMethodCall(const NIdentifier &id, ExpressionList &arguments) : id(id), arguments(arguments) {}
-    NMethodCall(const NIdentifier &id) : id(id) {}
+    NMethodCall(const NIdentifier &id, ExpressionList &arguments) : id(id), arguments(arguments) { line = lineNumber; }
+    NMethodCall(const NIdentifier &id) : id(id) { line = lineNumber; }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -107,7 +123,7 @@ public:
     int op;
     NExpression &lhs;
     NExpression &rhs;
-    NBinaryOperator(NExpression &lhs, int op, NExpression &rhs) : lhs(lhs), rhs(rhs), op(op) {}
+    NBinaryOperator(NExpression &lhs, int op, NExpression &rhs) : lhs(lhs), rhs(rhs), op(op) { line = lineNumber; }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -117,7 +133,7 @@ public:
     // TODO: check type & assignmentExpr.type
     NIdentifier &id;
     NExpression &indexExpr;
-    NArrayVariable(NIdentifier &id, NExpression &indexExpr) : id(id), indexExpr(indexExpr) {}
+    NArrayVariable(NIdentifier &id, NExpression &indexExpr) : id(id), indexExpr(indexExpr) { line = lineNumber; }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -128,8 +144,8 @@ public:
     NIdentifier &lhs;
     NExpression &rhs;
     NArrayVariable variable;
-    NAssignment(NIdentifier &lhs, NExpression &rhs) : lhs(lhs), rhs(rhs), isArrayVariable(false), variable(lhs, rhs) {}
-    NAssignment(NIdentifier &lhs, NExpression &rhs, NExpression &index) : lhs(lhs), rhs(rhs), isArrayVariable(true), variable(lhs, index) {}
+    NAssignment(NIdentifier &lhs, NExpression &rhs) : lhs(lhs), rhs(rhs), isArrayVariable(false), variable(lhs, rhs) { line = lineNumber; }
+    NAssignment(NIdentifier &lhs, NExpression &rhs, NExpression &index) : lhs(lhs), rhs(rhs), isArrayVariable(true), variable(lhs, index) { line = lineNumber; }
 
     virtual void codeGen(CodeGenContext &context);
 };
@@ -146,7 +162,7 @@ class NExpressionStatement : public NStatement
 {
 public:
     NExpression &expression;
-    NExpressionStatement(NExpression &expression) : expression(expression) {}
+    NExpressionStatement(NExpression &expression) : expression(expression) { line = lineNumber; }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -170,7 +186,7 @@ public:
     VariableList arguments;
     NBlock &block;
     NFunctionDeclaration(ExprType type, const NIdentifier &id,
-                         const VariableList &arguments, NBlock &block) : type(type), id(id), arguments(arguments), block(block) {}
+                         const VariableList &arguments, NBlock &block) : type(type), id(id), arguments(arguments), block(block) { line = lineNumber; }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -182,7 +198,7 @@ public:
     NBlock *falseBlock;
     NIfStatement(NExpression &condition,
                  NBlock *trueBlock,
-                 NBlock *falseBlock = nullptr) : condition(condition), trueBlock(trueBlock), falseBlock(falseBlock) {}
+                 NBlock *falseBlock = nullptr) : condition(condition), trueBlock(trueBlock), falseBlock(falseBlock) { line = lineNumber; }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -197,11 +213,11 @@ public:
     NForStatement(NExpression *initializerExpr,
                   NExpression *condition,
                   NExpression *iterator,
-                  NBlock *block) : initializerExpr(initializerExpr), initializerDecl(nullptr), condition(condition), iterator(iterator), block(block) {}
+                  NBlock *block) : initializerExpr(initializerExpr), initializerDecl(nullptr), condition(condition), iterator(iterator), block(block) { line = lineNumber; }
     NForStatement(NStatement *initializerDecl,
                   NExpression *condition,
                   NExpression *iterator,
-                  NBlock *block) : initializerExpr(nullptr), initializerDecl(initializerDecl), condition(condition), iterator(iterator), block(block) {}
+                  NBlock *block) : initializerExpr(nullptr), initializerDecl(initializerDecl), condition(condition), iterator(iterator), block(block) { line = lineNumber; }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -211,7 +227,7 @@ public:
     NExpression *condition;
     NBlock *block;
     NWhileStatement(NExpression *condition,
-                    NBlock *block) : condition(condition), block(block) {}
+                    NBlock *block) : condition(condition), block(block) { line = lineNumber; }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -219,7 +235,7 @@ class NReturnStatement : public NStatement
 {
 public:
     NExpression *value;
-    NReturnStatement(NExpression *value = nullptr) : value(value) {}
+    NReturnStatement(NExpression *value = nullptr) : value(value) { line = lineNumber; }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -230,7 +246,7 @@ public:
     ExprType type;
     NIdentifier &id;
     NExpression *lengthExpr;
-    NArrayDeclaration(ExprType type, NIdentifier &id, NExpression *lengthExpr) : type(type), id(id), lengthExpr(lengthExpr) {}
+    NArrayDeclaration(ExprType type, NIdentifier &id, NExpression *lengthExpr) : type(type), id(id), lengthExpr(lengthExpr) { line = lineNumber; }
     virtual void codeGen(CodeGenContext &context);
 };
 
