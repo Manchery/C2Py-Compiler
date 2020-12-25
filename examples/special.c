@@ -6,6 +6,10 @@ int func1(int a){
     return a;
 }
 
+int func1(int a){
+    return 0;
+}
+
 int main(){
     int a=0;
     a=a+1;
@@ -13,4 +17,7 @@ int main(){
     b=0;
     a=func1(a);
     b=func2(a);
+    int arr[10];
+    arr[1]=a;
+    int arr;
 }
