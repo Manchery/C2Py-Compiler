@@ -338,7 +338,7 @@ void NFunctionDeclaration::codeGen(CodeGenContext &context)
     VariableList::const_iterator it;
     for (it = arguments.begin(); it != arguments.end(); it++)
     {
-         (**it).codeGen(context);
+        // (**it).codeGen(context);
         if (it != arguments.begin())
             context.code << ", ";
         context.code << (**it).id.name;
