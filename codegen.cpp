@@ -37,7 +37,9 @@ std::string CodeGenContext::outputCode()
 }
 
 /* -- Code Generation -- */
-
+// 以下代码中，每个函数用于生成不同类型结点的代码
+// 通常，其规则为根据AST中获得的信息，输出符合Python语法要求的代码
+// 对于需要特殊处理的函数，将在其定义部分给出详细注释
 void NInteger::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating integer: " << value << std::endl;
@@ -84,6 +86,9 @@ void NIdentifier::codeGen(CodeGenContext &context)
     }
 }
 
+// 为代码调用生成函数调用
+// 由于Python不支持printf, scanf, atoi和strlen等函数，因此需要特判
+// 其余由用户自行定义的函数则按照一般语法规则生成即可
 void NMethodCall::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating method call: " << id.name << ", " << arguments.size() << " arguments" << std::endl;
@@ -218,6 +223,8 @@ void NAssignment::codeGen(CodeGenContext &context)
     rhs.codeGen(context);
 }
 
+// 代码块的生成
+// 每生成一个代码块，就需要维护缩进、作用域栈帧、符号表等信息
 void NBlock::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating block" << std::endl;
@@ -238,12 +245,6 @@ void NBlock::codeGen(CodeGenContext &context)
         context.code << std::string(context.indent, '\t') << "pass" << std::endl;
     }
 
-    // auto &layer = context.stack[context.stack.size() - 1];
-    // for (int i = 0; i < layer.size(); i++)
-    // {
-    //     auto *decl = &layer[i];
-    //     delete decl;
-    // }
     context.stack.pop_back();
     std::cerr << "Leaving block" << std::endl;
     context.indent--;
@@ -257,6 +258,7 @@ void NExpressionStatement::codeGen(CodeGenContext &context)
     context.code << std::endl;
 }
 
+// 查找同作用域中的变量声明
 int CodeGenContext::findLayerDeclaration(std::string name)
 {
     auto &layer = stack[stack.size() - 1];
@@ -271,6 +273,7 @@ int CodeGenContext::findLayerDeclaration(std::string name)
     return 0;
 }
 
+// 在整个作用域栈中查找变量声明
 singleDeclaration *CodeGenContext::findDeclaration(std::string name, int type)
 {
     for (int i = stack.size() - type; i >= 0; i--)
@@ -288,6 +291,7 @@ singleDeclaration *CodeGenContext::findDeclaration(std::string name, int type)
     return nullptr;
 }
 
+// 变量声明时的重命名检测与处理
 void NVariableDeclaration::codeGen(CodeGenContext &context)
 {
     if (context.findLayerDeclaration(id.name))
@@ -302,9 +306,6 @@ void NVariableDeclaration::codeGen(CodeGenContext &context)
     {
         newName = id.name + '_' + std::to_string(context.stack.size() - 1);
     }
-    static int count = 0;
-    count++;
-    std::cerr << "performed times: " << std::to_string(count) << std::endl;
     layer.push_back(singleDeclaration{newName, id.name, id.type, &id});
     std::cerr << "Creating variable declaration " << type << " " << id.name << std::endl;
     if (assignmentExpr != nullptr)
@@ -319,6 +320,7 @@ void NVariableDeclaration::codeGen(CodeGenContext &context)
     context.code << std::endl;
 }
 
+// 函数声明时的重命名检测与处理
 void NFunctionDeclaration::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating function: " << id.name << std::endl;
@@ -391,6 +393,7 @@ void NIfStatement::codeGen(CodeGenContext &context)
     }
 }
 
+// For循环的参数处理与函数参数类似，需要解决重命名问题
 void NForStatement::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating for statement" << std::endl;
@@ -441,6 +444,7 @@ void NReturnStatement::codeGen(CodeGenContext &context)
     context.code << std::endl;
 }
 
+// 数组声明，需要单独维护其符号
 void NArrayDeclaration::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating array statement: " << id.name << std::endl;
@@ -466,6 +470,7 @@ void NArrayDeclaration::codeGen(CodeGenContext &context)
     context.code << std::endl;
 }
 
+// 引用数组变量也需要单独处理
 void NArrayVariable::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating array variable" << std::endl;

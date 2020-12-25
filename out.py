@@ -1,21 +1,21 @@
 from utils import *
 
-a = None
-def dothis(a_1):
-	global a
-	a_1 = (a_1 + 1)
-
+len = None
+str = [None] * 500
 def main():
-	global a
-	a = 0
-	a_2 = 1
-	if (a_2 == 0):
-		a_4 = 0
-		while (a_4 < 1):
-			a_5 = 1
-			a_4 = (a_4 + 1)
-	if (a_2 == 0):
-		x = a_2
+	global len, str
+	[str] = scanf("%s")
+	len = strlen(str)
+	palindrome = 1
+	i = 0
+	while (i < len):
+		if (str[i] != str[((len - i) - 1)]):
+			palindrome = 0
+		i = (i + 1)
+	if (palindrome == 1):
+		printf("True\n", ())
+	else:
+		printf("False\n", ())
 
 if __name__ == '__main__':
 	main()
