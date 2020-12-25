@@ -17,7 +17,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        freopen("in.txt", "r", stdin);
+        freopen("in.c", "r", stdin);
     }
     freopen("out.py", "w", stdout);
     yyparse();

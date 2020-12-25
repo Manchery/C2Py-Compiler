@@ -6,9 +6,12 @@ int len;
 char expr[500];
 
 char opStack[500];
+int sgnStack[500];
 int opTop = 0;
 double numStack[500];
 int numTop = 0;
+
+int sign = 0;
 
 int isOp(char c)
 {
@@ -51,7 +54,6 @@ double calc(double a, double b, char op)
     }
 }
 
-
 int main()
 {
     scanf("%s", expr);
@@ -67,34 +69,63 @@ int main()
     {
         if (isOp(expr[i]) == 1)
         {
-            if (bufPtr > 0)
+            if ((expr[i] == '+' || expr[i] == '-') && (i == 0 || expr[i - 1] == '('))
             {
-                numBuffer[bufPtr] = 0;
-                bufPtr = 0;
-
-                numStack[numTop] = atoi(numBuffer);
-                numTop = numTop + 1;
-            }
-
-            if (expr[i] != '(')
-            {
-                while (opTop > 0 && opStack[opTop - 1] != '(' && opPrior(expr[i]) <= opPrior(opStack[opTop - 1]))
+                if (expr[i] == '+')
                 {
-                    int tmp = calc(numStack[numTop - 2], numStack[numTop - 1], opStack[opTop - 1]);
-                    numStack[numTop - 2] = tmp;
-                    numTop = numTop - 1;
-                    opTop = opTop - 1;
+                    sign = 1;
                 }
-            }
-
-            if (opStack[opTop - 1] == '(' && expr[i] == ')')
-            {
-                opTop = opTop - 1;
+                else
+                {
+                    sign = -1;
+                }
             }
             else
             {
-                opStack[opTop] = expr[i];
-                opTop = opTop + 1;
+                if (bufPtr > 0)
+                {
+                    numBuffer[bufPtr] = 0;
+                    bufPtr = 0;
+
+                    numStack[numTop] = atoi(numBuffer);
+                    if (sign != 0)
+                    {
+                        numStack[numTop] = numStack[numTop] * sign;
+                        sign = 0;
+                    }
+                    numTop = numTop + 1;
+                }
+
+                if (expr[i] != '(')
+                {
+                    while (opTop > 0 && opStack[opTop - 1] != '(' && opPrior(expr[i]) <= opPrior(opStack[opTop - 1]))
+                    {
+                        int tmp = calc(numStack[numTop - 2], numStack[numTop - 1], opStack[opTop - 1]);
+                        numStack[numTop - 2] = tmp;
+                        numTop = numTop - 1;
+                        opTop = opTop - 1;
+                    }
+                }
+
+                if (expr[i] == ')' && opStack[opTop - 1] == '(')
+                {
+                    if (sgnStack[opTop - 1] != 0)
+                    {
+                        numStack[numTop - 1] = numStack[numTop - 1] * sgnStack[opTop - 1];
+                        sgnStack[opTop - 1] = 0;
+                    }
+                    opTop = opTop - 1;
+                }
+                else
+                {
+                    opStack[opTop] = expr[i];
+                    if (expr[i] == '(')
+                    {
+                        sgnStack[opTop] = sign;
+                        sign = 0;
+                    }
+                    opTop = opTop + 1;
+                }
             }
         }
         else
@@ -110,6 +141,11 @@ int main()
         bufPtr = 0;
 
         numStack[numTop] = atoi(numBuffer);
+        if (sign != 0)
+        {
+            numStack[numTop] = numStack[numTop] * sign;
+            sign = 0;
+        }
         numTop = numTop + 1;
     }
 

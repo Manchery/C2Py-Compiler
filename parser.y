@@ -133,6 +133,7 @@ expr : logic_expr { fprintf(stderr, "expr->logic_expr\n"); }
 logic_expr: logic_expr TAND logic_expr { fprintf(stderr, "logic_expr->logic_expr TAND logic_expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
           | logic_expr TOR logic_expr { fprintf(stderr, "logic_expr->logic_expr TOR logic_expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
           | expr comparison expr { fprintf(stderr, "logic_expr->expr comparison expr\n"); $$ = new NBinaryOperator(*$1, $2, *$3); }
+          | TLPAREN logic_expr TRPAREN { fprintf(stderr, "expr->TLPAREN logic_expr TRPAREN\n"); $$ = $2; }
           ;
     
 call_args : /*blank*/  { $$ = new ExpressionList(); }
