@@ -76,7 +76,7 @@ void NIdentifier::codeGen(CodeGenContext &context)
     auto oldDeclaration = context.findDeclaration(name, 1);
     if (oldDeclaration == nullptr)
     {
-        context.errorMessage.push_back("Can't find declaration of " + name);
+        context.errorMessage.push_back("Line " + std::to_string(line) + ": Identifier \"" + name + "\" is undefined");
     }
     else
     {
@@ -137,7 +137,7 @@ void NMethodCall::codeGen(CodeGenContext &context)
         }
         if (bz)
         {
-            context.errorMessage.push_back("Func: " + id.name + " is not defined.");
+            context.errorMessage.push_back("Line " + std::to_string(line) + ": Function \"" + id.name + "\" is undefined");
             return;
         }
     }
@@ -292,7 +292,7 @@ void NVariableDeclaration::codeGen(CodeGenContext &context)
 {
     if (context.findLayerDeclaration(id.name))
     {
-        context.errorMessage.push_back("Line " + std::to_string(line) + ": Redefinition of Variable \'" + id.name + "\'.");
+        context.errorMessage.push_back("Line " + std::to_string(line) + ": Redefinition of identifier \"" + id.name + "\"");
         return;
     }
     auto &layer = context.stack[context.stack.size() - 1];
@@ -327,7 +327,7 @@ void NFunctionDeclaration::codeGen(CodeGenContext &context)
     {
         if (context.funcDeclaration[i] == id.name)
         {
-            context.errorMessage.push_back("Func: " + id.name + " is already defined.");
+            context.errorMessage.push_back("Line " + std::to_string(line) + ": Redefinition of function \"" + id.name + "\"");
             return;
         }
     }
@@ -448,7 +448,7 @@ void NArrayDeclaration::codeGen(CodeGenContext &context)
     auto &layer = context.stack[context.stack.size() - 1];
     if (context.findLayerDeclaration(id.name))
     {
-        context.errorMessage.push_back(id.name + " is already declared.");
+        context.errorMessage.push_back("Line " + std::to_string(line) + ": Redefinition of identifier \"" + id.name + "\"");
         return;
     }
     auto oldDeclaration = context.findDeclaration(id.name, 2);
