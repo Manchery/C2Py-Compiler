@@ -124,16 +124,20 @@ void NMethodCall::codeGen(CodeGenContext &context)
                      << ")";
         return;
     }
-    if ((id.name != "atoi") && (id.name != "strlen")){
+    if ((id.name != "atoi") && (id.name != "strlen"))
+    {
         int bz = 1;
-        for (int i=0;i<context.funcDeclaration.size();i++) {
-            if (context.funcDeclaration[i] == id.name) {
+        for (int i = 0; i < context.funcDeclaration.size(); i++)
+        {
+            if (context.funcDeclaration[i] == id.name)
+            {
                 bz = 0;
                 break;
             }
         }
-        if (bz) {
-            context.errorMessage.push_back("Func:"+id.name+" is not defined.");
+        if (bz)
+        {
+            context.errorMessage.push_back("Func: " + id.name + " is not defined.");
             return;
         }
     }
@@ -292,8 +296,9 @@ singleDeclaration *CodeGenContext::findDeclaration(std::string name, int type)
 
 void NVariableDeclaration::codeGen(CodeGenContext &context)
 {
-    if (context.findLayerDeclaration(id.name)) {
-        context.errorMessage.push_back(id.name+" is already declared.");
+    if (context.findLayerDeclaration(id.name))
+    {
+        context.errorMessage.push_back("Line " + std::to_string(line) + ": Redefinition of Variable \'" + id.name + "\'.");
         return;
     }
     auto &layer = context.stack[context.stack.size() - 1];
@@ -324,9 +329,11 @@ void NFunctionDeclaration::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating function: " << id.name << std::endl;
 
-    for (int i=0;i<context.funcDeclaration.size();i++) {
-        if (context.funcDeclaration[i] == id.name) {
-            context.errorMessage.push_back("Func:"+id.name+" is already defined.");
+    for (int i = 0; i < context.funcDeclaration.size(); i++)
+    {
+        if (context.funcDeclaration[i] == id.name)
+        {
+            context.errorMessage.push_back("Func: " + id.name + " is already defined.");
             return;
         }
     }
@@ -345,18 +352,21 @@ void NFunctionDeclaration::codeGen(CodeGenContext &context)
     }
     context.code << "):" << std::endl;
 
-
     auto &layer = context.stack[0];
-    for (int i = 0; i<layer.size();i++) {
-        int bz=1;
-        for (int j = 0; j < context.pendingLayer.size(); j++){
-            if (layer[i].newName == context.pendingLayer[j].newName) {
+    for (int i = 0; i < layer.size(); i++)
+    {
+        int bz = 1;
+        for (int j = 0; j < context.pendingLayer.size(); j++)
+        {
+            if (layer[i].newName == context.pendingLayer[j].newName)
+            {
                 bz = 0;
                 break;
             }
         }
-        if (bz){
-            context.code << "\tglobal " << layer[i].newName << std::endl; 
+        if (bz)
+        {
+            context.code << "\tglobal " << layer[i].newName << std::endl;
         }
     }
 
@@ -435,8 +445,9 @@ void NArrayDeclaration::codeGen(CodeGenContext &context)
     std::cerr << "Creating array statement: " << id.name << std::endl;
 
     auto &layer = context.stack[context.stack.size() - 1];
-    if (context.findLayerDeclaration(id.name)) {
-        context.errorMessage.push_back(id.name+" is already declared.");
+    if (context.findLayerDeclaration(id.name))
+    {
+        context.errorMessage.push_back(id.name + " is already declared.");
         return;
     }
     auto oldDeclaration = context.findDeclaration(id.name, 2);
@@ -458,7 +469,6 @@ void NArrayVariable::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating array variable" << std::endl;
 
-    
     // id.type = ARRAY;
     id.codeGen(context);
 

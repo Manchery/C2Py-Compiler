@@ -5,12 +5,13 @@
 #define SAVE_TOKEN yylval.string = new std::string(yytext, yyleng)
 #define TOKEN(t) (yylval.token = t)
 extern "C" int yywrap() { }
+extern int lineNumber;
 %}
 
 %%
 
 ^"#include ".+                          fprintf(stderr, "include line\n");
-[ \t\n]                                 ;
+[ \t\r]                                 ;
 
 "if"                                    return TOKEN(TIF);
 "else"                                  return TOKEN(TELSE);
@@ -58,6 +59,8 @@ extern "C" int yywrap() { }
 "-"                                     return TOKEN(TMINUS);
 "*"                                     return TOKEN(TMUL);
 "/"                                     return TOKEN(TDIV);
+
+"\n"                                    lineNumber += 1;
 
 .                                       printf("Unknown token!n"); yyterminate();
 

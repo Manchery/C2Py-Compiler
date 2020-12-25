@@ -4,6 +4,8 @@
 
     extern int yylex();
     void yyerror(const char *s) { fprintf(stderr, "ERROR: %sn", s); }
+
+    int lineNumber = 1;
 %}
 
 %error-verbose

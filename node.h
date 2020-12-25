@@ -20,6 +20,8 @@ typedef std::vector<NStatement *> StatementList;
 typedef std::vector<NExpression *> ExpressionList;
 typedef std::vector<NVariableDeclaration *> VariableList;
 
+extern int lineNumber;
+
 enum ExprType
 {
     UNKNOWN,
@@ -34,6 +36,7 @@ enum ExprType
 class Node
 {
 public:
+    int line;
     virtual ~Node() {}
     virtual void codeGen(CodeGenContext &context) {}
 };
@@ -68,11 +71,7 @@ class NString : public NExpression
 {
 public:
     std::string value;
-    NString(const std::string &value) : value(value)
-    {
-        type = STR;
-        std::cerr << value << std::endl;
-    }
+    NString(const std::string &value) : value(value) { type = STR; }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -80,11 +79,7 @@ class NChar : public NExpression
 {
 public:
     char value;
-    NChar(char value) : value(value)
-    {
-        type = CHAR;
-        std::cerr << value << std::endl;
-    }
+    NChar(char value) : value(value) { type = CHAR; }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -92,7 +87,7 @@ class NIdentifier : public NExpression
 {
 public:
     std::string name;
-    NIdentifier(const std::string &name) : name(name) {}
+    NIdentifier(const std::string &name) : name(name) { line = lineNumber; }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -162,8 +157,8 @@ public:
     ExprType type;
     NIdentifier &id;
     NExpression *assignmentExpr;
-    NVariableDeclaration(ExprType type, NIdentifier &id) : type(type), id(id), assignmentExpr(nullptr) {}
-    NVariableDeclaration(ExprType type, NIdentifier &id, NExpression *assignmentExpr) : type(type), id(id), assignmentExpr(assignmentExpr) {}
+    NVariableDeclaration(ExprType type, NIdentifier &id) : type(type), id(id), assignmentExpr(nullptr) { line = lineNumber; }
+    NVariableDeclaration(ExprType type, NIdentifier &id, NExpression *assignmentExpr) : type(type), id(id), assignmentExpr(assignmentExpr) { line = lineNumber; }
     virtual void codeGen(CodeGenContext &context);
 };
 
@@ -238,6 +233,5 @@ public:
     NArrayDeclaration(ExprType type, NIdentifier &id, NExpression *lengthExpr) : type(type), id(id), lengthExpr(lengthExpr) {}
     virtual void codeGen(CodeGenContext &context);
 };
-
 
 #endif
