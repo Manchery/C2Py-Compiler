@@ -186,7 +186,7 @@ public:
     VariableList arguments;
     NBlock &block;
     NFunctionDeclaration(ExprType type, const NIdentifier &id,
-                         const VariableList &arguments, NBlock &block) : type(type), id(id), arguments(arguments), block(block) { line = lineNumber; }
+                         const VariableList &arguments, NBlock &block) : type(type), id(id), arguments(arguments), block(block) { line = id.line; }
     virtual void codeGen(CodeGenContext &context);
 };
 
