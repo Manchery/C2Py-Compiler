@@ -69,7 +69,7 @@ int main()
     {
         if (isOp(expr[i]) == 1)
         {
-            if ((expr[i] == '+' || expr[i] == '-') && (i == 0 || expr[i - 1] == '('))
+            if ((expr[i] == '+' || expr[i] == '-') && (i == 0 || expr[i - 1] == '(' || expr[i - 1] == '*' || expr[i - 1] == '/'))
             {
                 if (expr[i] == '+')
                 {
