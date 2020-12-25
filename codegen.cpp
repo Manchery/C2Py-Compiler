@@ -223,12 +223,6 @@ void NBlock::codeGen(CodeGenContext &context)
     std::cerr << "Creating block" << std::endl;
     context.indent++;
     context.stack.push_back(std::vector<singleDeclaration>());
-    auto &layer = context.stack[context.stack.size() - 1];
-    for (int i = 0; i < context.pendingLayer.size(); i++)
-    {
-        layer.push_back(context.pendingLayer[i]);
-    }
-    context.pendingLayer.clear();
     std::cerr << "Current indents: " << context.indent << std::endl;
 
     StatementList::const_iterator it;
@@ -306,7 +300,7 @@ void NVariableDeclaration::codeGen(CodeGenContext &context)
     std::string newName = id.name;
     if (oldDeclaration != nullptr)
     {
-        newName = id.name + '_' + std::to_string(context.indent);
+        newName = id.name + '_' + std::to_string(context.stack.size() - 1);
     }
     static int count = 0;
     count++;
@@ -340,25 +334,25 @@ void NFunctionDeclaration::codeGen(CodeGenContext &context)
     context.funcDeclaration.push_back(id.name);
     context.code << "def " << id.name << "(";
 
+    context.stack.push_back(std::vector<singleDeclaration>());
     VariableList::const_iterator it;
     for (it = arguments.begin(); it != arguments.end(); it++)
     {
-        context.pendingLayer.push_back(singleDeclaration{(**it).id.name, (**it).id.name, (**it).id.type, &(**it).id});
-
-        // (**it).codeGen(context);
+         (**it).codeGen(context);
         if (it != arguments.begin())
             context.code << ", ";
         context.code << (**it).id.name;
     }
     context.code << "):" << std::endl;
 
-    auto &layer = context.stack[0];
-    for (int i = 0; i < layer.size(); i++)
+    auto &firstLayer = context.stack[0];
+    auto &lastLayer = context.stack[context.stack.size()-1];
+    for (int i = 0; i < firstLayer.size(); i++)
     {
         int bz = 1;
-        for (int j = 0; j < context.pendingLayer.size(); j++)
+        for (int j = 0; j < lastLayer.size(); j++)
         {
-            if (layer[i].newName == context.pendingLayer[j].newName)
+            if (firstLayer[i].newName == lastLayer[j].newName)
             {
                 bz = 0;
                 break;
@@ -366,11 +360,13 @@ void NFunctionDeclaration::codeGen(CodeGenContext &context)
         }
         if (bz)
         {
-            context.code << "\tglobal " << layer[i].newName << std::endl;
+            context.code << "\tglobal " << firstLayer[i].newName << std::endl;
         }
     }
 
     block.codeGen(context);
+
+    context.stack.pop_back();
 
     context.code << std::endl;
 }
@@ -396,6 +392,7 @@ void NForStatement::codeGen(CodeGenContext &context)
 {
     std::cerr << "Creating for statement" << std::endl;
 
+    context.stack.push_back(std::vector<singleDeclaration>());
     if (initializerExpr != nullptr)
         initializerExpr->codeGen(context);
     if (initializerDecl != nullptr)
@@ -413,6 +410,7 @@ void NForStatement::codeGen(CodeGenContext &context)
     iterator->codeGen(context);
     context.code << std::endl;
     context.indent--;
+    context.stack.pop_back();
 }
 
 void NWhileStatement::codeGen(CodeGenContext &context)

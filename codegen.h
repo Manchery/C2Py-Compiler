@@ -31,7 +31,6 @@ public:
     std::stringstream code;
     std::vector<std::vector<singleDeclaration>> stack;
     std::vector<std::string> errorMessage;
-    std::vector<singleDeclaration> pendingLayer;
     std::vector<std::string> funcDeclaration;
 
 public:
