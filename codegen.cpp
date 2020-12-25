@@ -355,14 +355,17 @@ void NFunctionDeclaration::codeGen(CodeGenContext &context)
     context.code << "):" << std::endl;
 
     auto &firstLayer = context.stack[0];
-    context.code << "\tglobal ";
-    for (int i = 0; i < firstLayer.size(); i++)
+    if (firstLayer.size())
     {
-        if (i)
-            context.code << ", ";
-        context.code << firstLayer[i].oldName;
+        context.code << "\tglobal ";
+        for (int i = 0; i < firstLayer.size(); i++)
+        {
+            if (i)
+                context.code << ", ";
+            context.code << firstLayer[i].oldName;
+        }
+        context.code << std::endl;
     }
-    context.code << std::endl;
 
     block.codeGen(context);
 
