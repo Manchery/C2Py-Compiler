@@ -100,7 +100,7 @@ int main()
                 {
                     while (opTop > 0 && opStack[opTop - 1] != '(' && opPrior(expr[i]) <= opPrior(opStack[opTop - 1]))
                     {
-                        int tmp = calc(numStack[numTop - 2], numStack[numTop - 1], opStack[opTop - 1]);
+                        double tmp = calc(numStack[numTop - 2], numStack[numTop - 1], opStack[opTop - 1]);
                         numStack[numTop - 2] = tmp;
                         numTop = numTop - 1;
                         opTop = opTop - 1;
@@ -151,7 +151,7 @@ int main()
 
     while (opTop > 0)
     {
-        int tmp = calc(numStack[numTop - 2], numStack[numTop - 1], opStack[opTop - 1]);
+        double tmp = calc(numStack[numTop - 2], numStack[numTop - 1], opStack[opTop - 1]);
         numStack[numTop - 2] = tmp;
         numTop = numTop - 1;
         opTop = opTop - 1;

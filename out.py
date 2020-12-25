@@ -71,7 +71,7 @@ def main():
 	i = 0
 	while (i < len):
 		if (isOp(expr[i]) == 1):
-			if (((expr[i] == '+') or (expr[i] == '-')) and ((i == 0) or (expr[(i - 1)] == '('))):
+			if (((expr[i] == '+') or (expr[i] == '-')) and ((((i == 0) or (expr[(i - 1)] == '(')) or (expr[(i - 1)] == '*')) or (expr[(i - 1)] == '/'))):
 				if (expr[i] == '+'):
 					sign = 1
 				else:
