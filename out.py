@@ -9,25 +9,11 @@ numStack = [None] * 500
 numTop = 0
 sign = 0
 def isOp(c):
-	global len
-	global expr
-	global opStack
-	global sgnStack
-	global opTop
-	global numStack
-	global numTop
-	global sign
+	global len, expr, opStack, sgnStack, opTop, numStack, numTop, sign
 	return ((((((c == '+') or (c == '-')) or (c == '*')) or (c == '/')) or (c == '(')) or (c == ')'))
 
 def opPrior(c):
-	global len
-	global expr
-	global opStack
-	global sgnStack
-	global opTop
-	global numStack
-	global numTop
-	global sign
+	global len, expr, opStack, sgnStack, opTop, numStack, numTop, sign
 	if ((c == '+') or (c == '-')):
 		return 1
 	if ((c == '*') or (c == '/')):
@@ -36,14 +22,7 @@ def opPrior(c):
 		return 0
 
 def calc(a, b, op):
-	global len
-	global expr
-	global opStack
-	global sgnStack
-	global opTop
-	global numStack
-	global numTop
-	global sign
+	global len, expr, opStack, sgnStack, opTop, numStack, numTop, sign
 	if (op == '+'):
 		return (a + b)
 	if (op == '-'):
@@ -54,14 +33,7 @@ def calc(a, b, op):
 		return (a / b)
 
 def main():
-	global len
-	global expr
-	global opStack
-	global sgnStack
-	global opTop
-	global numStack
-	global numTop
-	global sign
+	global len, expr, opStack, sgnStack, opTop, numStack, numTop, sign
 	[expr] = scanf("%s")
 	len = strlen(expr)
 	pointer = 0

@@ -347,31 +347,22 @@ void NFunctionDeclaration::codeGen(CodeGenContext &context)
             newName = (**it).id.name + '_' + std::to_string(context.stack.size() - 1);
         }
         layer.push_back(singleDeclaration{newName, (**it).id.name, (**it).id.type, &(**it).id});
-        
+
         if (it != arguments.begin())
             context.code << ", ";
-        context.code << (**it).id.name;
+        context.code << newName;
     }
     context.code << "):" << std::endl;
 
     auto &firstLayer = context.stack[0];
-    auto &lastLayer = context.stack[context.stack.size()-1];
+    context.code << "\tglobal ";
     for (int i = 0; i < firstLayer.size(); i++)
     {
-        int bz = 1;
-        for (int j = 0; j < lastLayer.size(); j++)
-        {
-            if (firstLayer[i].newName == lastLayer[j].newName)
-            {
-                bz = 0;
-                break;
-            }
-        }
-        if (bz)
-        {
-            context.code << "\tglobal " << firstLayer[i].newName << std::endl;
-        }
+        if (i)
+            context.code << ", ";
+        context.code << firstLayer[i].oldName;
     }
+    context.code << std::endl;
 
     block.codeGen(context);
 
