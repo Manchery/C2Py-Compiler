@@ -339,6 +339,15 @@ void NFunctionDeclaration::codeGen(CodeGenContext &context)
     for (it = arguments.begin(); it != arguments.end(); it++)
     {
         // (**it).codeGen(context);
+        auto &layer = context.stack[context.stack.size() - 1];
+        auto oldDeclaration = context.findDeclaration((**it).id.name, 2);
+        std::string newName = (**it).id.name;
+        if (oldDeclaration != nullptr)
+        {
+            newName = (**it).id.name + '_' + std::to_string(context.stack.size() - 1);
+        }
+        layer.push_back(singleDeclaration{newName, (**it).id.name, (**it).id.type, &(**it).id});
+        
         if (it != arguments.begin())
             context.code << ", ";
         context.code << (**it).id.name;

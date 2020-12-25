@@ -1,6 +1,58 @@
 from utils import *
 
-a = None
+len = None
+expr = [None] * 500
+opStack = [None] * 500
+sgnStack = [None] * 500
+opTop = 0
+numStack = [None] * 500
+numTop = 0
+sign = 0
+def isOp(c):
+	global len
+	global expr
+	global opStack
+	global sgnStack
+	global opTop
+	global numStack
+	global numTop
+	global sign
+	return ((((((c == '+') or (c == '-')) or (c == '*')) or (c == '/')) or (c == '(')) or (c == ')'))
+
+def opPrior(c):
+	global len
+	global expr
+	global opStack
+	global sgnStack
+	global opTop
+	global numStack
+	global numTop
+	global sign
+	if ((c == '+') or (c == '-')):
+		return 1
+	if ((c == '*') or (c == '/')):
+		return 2
+	if ((c == '(') or (c == ')')):
+		return 0
+
+def calc(a, b, op):
+	global len
+	global expr
+	global opStack
+	global sgnStack
+	global opTop
+	global numStack
+	global numTop
+	global sign
+	if (op == '+'):
+		return (a + b)
+	if (op == '-'):
+		return (a - b)
+	if (op == '*'):
+		return (a * b)
+	if (op == '/'):
+		return (a / b)
+
 def main():
 	global len
 	global expr
@@ -19,7 +71,7 @@ def main():
 	i = 0
 	while (i < len):
 		if (isOp(expr[i]) == 1):
-			if (((expr[i] == '+') or (expr[i] == '-')) and ((((i == 0) or (expr[(i - 1)] == '(')) or (expr[(i - 1)] == '*')) or (expr[(i - 1)] == '/'))):
+			if (((expr[i] == '+') or (expr[i] == '-')) and ((((((i == 0) or (expr[(i - 1)] == '(')) or (expr[(i - 1)] == '+')) or (expr[(i - 1)] == '-')) or (expr[(i - 1)] == '*')) or (expr[(i - 1)] == '/'))):
 				if (expr[i] == '+'):
 					sign = 1
 				else:
