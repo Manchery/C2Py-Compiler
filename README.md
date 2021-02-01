@@ -16,7 +16,7 @@ For details, see our report and slides (in Chinese).
 
 Support:
 
-- Varible and literal
+- Variable and literal
 - Arithmetic and logical expression
 - Conditional and loop statements
 - One-dimensional array
